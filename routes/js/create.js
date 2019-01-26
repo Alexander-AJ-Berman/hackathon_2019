@@ -13,7 +13,7 @@ $(document).ready(function() {
 	    	alert("Passwords don't match!");
 	    }
 	    else {
-	    	$.post('/app.js', {
+	    	$.post('/create', {
 	    		session: session, password: password,
 			}, function(data){
                 window.location.href = "/";
