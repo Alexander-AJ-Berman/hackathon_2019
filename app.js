@@ -5,6 +5,8 @@ var mongoose = require('mongoose');
 var db = mongoose.connection;
 const router = express.Router();
 var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Handles spotify login and Auth
 function spotify_login() {
@@ -17,7 +19,7 @@ router.get('/',function(req,res){
   //__dirname : It will resolve to your project folder.
 });
 
-router.get('/spotifyLogin',function(req,res){
+router.get('/spotifyLogin',function(req, res){
   res.sendFile(path.join(__dirname+'/views/spotifyLogin.html'));
   //__dirname : It will resolve to your project folder.
 });
@@ -27,8 +29,27 @@ router.get('/create', function(req, res){
   // Continued logic for creating a room with database entries
 });
 
-router.post('/create', function(req, res) {
-  // handle post request for create
+router.post('/create_user', function(req, res) {
+
+  var userID = "user ID Placeholder";
+  var access_token = "access token placeholder";
+  var refresh_token = "refresh token placeholder";
+
+
+  var newUser = new User({
+      name: req.body.name,
+      userID: userID,
+      access_token: access_token,
+      refresh_token: refresh_token,
+      song: {
+        name: "One More Time",
+        artist: "Daft Punk",
+        timestamp: "00:00:00"
+      }
+    });
+    newUser.save();
+
+  
 });
 
 // Add someone to a room with synchro logic
@@ -74,6 +95,7 @@ var userSchema = new mongoose.Schema({
   refresh_token: String,
   song: {
     name: String,
+    artist: String,
     timestamp: String
   }
 });
