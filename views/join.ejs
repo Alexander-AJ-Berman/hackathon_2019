@@ -30,6 +30,11 @@
 <html>
   <head></head>
   <body>
-    Here's a room name!<%= room_name%>;
+    <ul>
+      <% room_names.forEach(function(room){ %>
+        <%= room.name %>
+        <br><br>
+      <% }) %>
+    </ul>
   </body>
 </html>
