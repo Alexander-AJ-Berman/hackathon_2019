@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Express HTML</title>
+  <title>Welcome</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
@@ -10,31 +10,42 @@
 <body>
   <div style="margin:100px;">
     <nav class="navbar navbar-inverse navbar-static-top">
-  <div class="container">
-    <a class="navbar-brand" href="/">Express HTML</a>
-    <ul class="nav navbar-nav">
-      <li class="active">
-        <a href="/">Home</a>
-      </li>
-      <li>
-        <a href="/about">About</a>
-      </li>
-      <li>
-        <a href="/sitemap">Sitemap</a>
-      </li>
-    </ul>
-  </div>
-</nav>
+    <a class="navbar-brand" href="#">SAP</a>
+    </nav>
     <div class="jumbotron"  style="padding:40px;">
       <h1>Welcome to SAP! Ready to get LIT fam?</h1>
       <p>Use your favorite pair of AIR PODS and enjoy a banging sesh with all of your friends! Using SAP you can all listen to music simultaneously from your own devices. Connect now to find out more.</p>
       <a href="/create">
-        <button>Create a Session</button>
+        <button class="button">Create a Session</button>
       </a>
       <a href="/join">
-        <button>Join a Session</button>
+        <button class="button">Join a Session</button>
       </a>
     </div>
   </div>
 </body>
+<style>
+.button {
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;  
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+</style>
 </html>
