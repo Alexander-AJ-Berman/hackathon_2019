@@ -21,6 +21,8 @@ router.get('/join', function(req, res) {
 
 //add the router
 app.use('/', router);
+app.use('/create', router);
+app.use('join', router);
 app.listen(process.env.port || 3000);
 
 console.log("If you own airpods, I'm listening on 3000...");
