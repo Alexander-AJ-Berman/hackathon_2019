@@ -8,6 +8,11 @@ router.get('/',function(req,res){
   //__dirname : It will resolve to your project folder.
 });
 
+router.get('/spotifyLogin',function(req,res){
+  res.sendFile(path.join(__dirname+'/views/spotifyLogin.html'));
+  //__dirname : It will resolve to your project folder.
+});
+
 router.get('/create', function(req, res){
   res.sendFile(path.join(__dirname + '/views/create.html'));
   // Continued logic for creating a room with database entries
@@ -18,6 +23,15 @@ router.get('/join', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/join.html'));
   // Continued logic for joining a room, with db entries
 });
+
+router.get('/playback', function(req, res) {
+  res.sendFile(path.join(__dirname + '/views/webplaybacktest.html'));
+  // Continued logic for joining a room, with db entries
+});
+
+
+// set up static routing
+app.use(express.static(path.join(__dirname, 'public')));
 
 //add the router
 app.use('/', router);
