@@ -7,6 +7,7 @@ const router = express.Router();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
 
 // Handles spotify login and Auth
 function spotify_login() {
@@ -67,8 +68,7 @@ router.post('/create_user', function(req, res) {
 
 // Add someone to a room with synchro logic
 router.get('/join', function(req, res) {
-  res.sendFile(path.join(__dirname + '/views/join.html'));
-  // Continued logic for joining a room, with db entries
+  res.render(__dirname + '/views/join', {room_name: "AJ's room"});
 });
 
 router.get('/playback', function(req, res) {
