@@ -34,6 +34,7 @@ router.post('/create_user', function(req, res) {
   var userID = "user ID Placeholder";
   var access_token = "access token placeholder";
   var refresh_token = "refresh token placeholder";
+  var pwd = req.body.pwd;
 
 
   var newUser = new User({
