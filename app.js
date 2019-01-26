@@ -61,6 +61,8 @@ router.post('/create_user', function(req, res) {
     pwd: pwd
   });
   newRoom.save();
+
+  res.send("Thanks for navigating! Please wait");
 });
 
 // Add someone to a room with synchro logic
