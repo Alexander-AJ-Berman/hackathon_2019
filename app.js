@@ -3,7 +3,13 @@ const app = express();
 const path = require('path');
 const router = express.Router();
 
+// Handles spotify login and Auth
+function spotify_login() {
+  // TODO; for K
+}
+
 router.get('/',function(req,res){
+  spotify_login();
   res.sendFile(path.join(__dirname+'/views/index.html'));
   //__dirname : It will resolve to your project folder.
 });
