@@ -34,7 +34,6 @@ router.post('/create_user', function(req, res) {
   var userID = "user ID Placeholder";
   var access_token = "access token placeholder";
   var refresh_token = "refresh token placeholder";
-  var pwd = req.body.pwd;
 
 
   var newUser = new User({
@@ -48,9 +47,20 @@ router.post('/create_user', function(req, res) {
         timestamp: "00:00:00"
       }
     });
-    newUser.save();
+  newUser.save();
 
-  
+  var pwd = req.body.pwd;
+  var room_name = req.body.room_name;
+  var roomID = "room ID placeholder";
+  var users = ["AJ", "Kei", "Ali", "Dim", "C"];
+
+  var newRoom = new Room({
+    name: room_name,
+    roomID: roomID,
+    users: users,
+    pwd: pwd
+  });
+  newRoom.save();
 });
 
 // Add someone to a room with synchro logic
@@ -88,7 +98,7 @@ mongoose.connect(
   { useNewUrlParser: true}
   );
 
-// Creating a schema
+// Creating a user schema
 var userSchema = new mongoose.Schema({
   name: String,
   userID: String,
@@ -101,6 +111,15 @@ var userSchema = new mongoose.Schema({
   }
 });
 
+// Create a room
+var roomSchema = new mongoose.Schema({
+  name: String,
+  roomID: String,
+  users: [String],
+  pwd: String
+});
+
 
 var User = mongoose.model('User', userSchema);
+var Room = mongoose.model('Room', roomSchema);
 
