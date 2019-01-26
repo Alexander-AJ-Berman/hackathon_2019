@@ -27,6 +27,10 @@ router.get('/create', function(req, res){
   // Continued logic for creating a room with database entries
 });
 
+router.post('/create', function(req, res) {
+  // handle post request for create
+});
+
 // Add someone to a room with synchro logic
 router.get('/join', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/join.html'));
@@ -37,6 +41,7 @@ router.get('/playback', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/webplaybacktest.html'));
   // Continued logic for joining a room, with db entries
 });
+
 
 
 
