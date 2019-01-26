@@ -1,7 +1,10 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+var mongoose = require('mongoose');
+var db = mongoose.connection;
 const router = express.Router();
+var bodyParser = require('body-parser');
 
 // Handles spotify login and Auth
 function spotify_login() {
@@ -36,9 +39,10 @@ router.get('/playback', function(req, res) {
 });
 
 
+
+
 // set up static routing
 app.use(express.static(path.join(__dirname, 'public')));
-
 //add the router
 app.use('/', router);
 app.use('/create', router);
@@ -46,3 +50,29 @@ app.use('join', router);
 app.listen(process.env.port || 3000);
 
 console.log("If you own airpods, I'm listening on 3000...");
+
+db.once('open', function() {
+  console.log('Connected to DB...');
+});
+
+// Connect mongoose, credentials: USER - sap_user PASS - sap_user1
+mongoose.connect(
+  'mongodb://sap_user:sap_user1@ds113765.mlab.com:13765/sap',
+  { useNewUrlParser: true}
+  );
+
+// Creating a schema
+var userSchema = new mongoose.Schema({
+  name: String,
+  userID: String,
+  access_token: String,
+  refresh_token: String,
+  song: {
+    name: String,
+    timestamp: String
+  }
+});
+
+
+var User = mongoose.model('User', userSchema);
+
