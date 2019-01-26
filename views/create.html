@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"></head>
+		<title>Welcome</title>
+	</head>
+	<body>
+		 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		 	<a class="navbar-brand" href="#">SAP</a>
+		 </nav>
+		 <h1 class="sessions_header">Create Session: </h1>
+        <div class="sessions_container">
+            <form id="form">
+				<br><br>
+				<div class="Session">
+					<label for="course">Session Name</label>
+					<input type="text" name="session" id="session" placeholder="ex: Buxton SAP" class="form-control">
+				</div>
+				<div class="Password">
+					<label for="password">Set Password</label>
+					<input type="password" name="password" id="password" class="form-control">
+				</div>
+				<div class="form-group">
+						<label for="password2">Repeat Password</label>
+						<input type="password" class="form-control" name="password2" id="password2">
+				</div>
+				<input type="submit" id="submit" value="Create Session">
+			</form>
+
+        </div>
+	</body>
+	<script src="create.js"></script>
+</html>
