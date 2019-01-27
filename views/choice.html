@@ -147,6 +147,14 @@ button:hover {
           transform: rotateX(20deg);
 }
 
+#first{
+  margin-right:3%;
+}
+
+#second{
+  margin-right:3%;
+}
+
 button:active {
   top: 0px;
   box-shadow: 0px 0px 0px rgba( 15, 165, 60, 0.0 );
@@ -162,10 +170,10 @@ button:active {
 <div class="bg-text">
   <h1 style="font-size:50px">Choose.</h1>
   <a href="/create_room">
-    <button class="button">Create a Session</button>
+    <button id="first" class="button">Create a Session</button>
   </a>
   <a href="/join_room">
-    <button class="button">Join a Session</button>
+    <button id="second" class="button">Join a Session</button>
   </a>
   <a href="omt">
     <button class="button" id="omt">ONE MORE TIME</button>
