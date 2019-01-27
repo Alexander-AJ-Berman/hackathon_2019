@@ -135,8 +135,8 @@ app.get('/callback', function(req, res) {
         // we can also pass the token to the browser to make requests from there
         // CREATE USER WITH DATA
         res.redirect('/choice');
-        
-        
+
+
       } else {
         res.redirect('/#' +
           querystring.stringify({
@@ -145,7 +145,7 @@ app.get('/callback', function(req, res) {
       }
     });
   }
-  
+
 });
 
 app.post('/prompt_name', function(req, res) {
@@ -243,7 +243,7 @@ router.post('/create_room', function(req, res) {
   var pwd = req.body.pwd;
   var room_name = req.body.room_name;
   // MAKEUP
-  var roomID = "room ID placeholder";
+  var roomID = generateRandomString(8);
   var users = [name];
 
   var newRoom = new Room({
@@ -273,7 +273,7 @@ router.get('/join_room', function(req, res) {
 
 });
 
-// POST route handler 
+// POST route handler
 router.post('/select_room', function(req, res) {
   var user_IDs = [];
   Room.findOne({ 'name': req.body.name }, function (err, room) {
