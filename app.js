@@ -15,7 +15,7 @@ var request = require('request'); // "Request" library
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
-let client_secret = "16402dc536894211b0124407db1f5b64";
+let client_secret = "e69eecc6c2284e549524b8083c8e18da";
 let redirect_uri = 'https://synchronizedairpodplayer.herokuapp.com/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
