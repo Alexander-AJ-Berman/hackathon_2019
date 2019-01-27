@@ -218,6 +218,7 @@ router.get('/omt', function(req,res) {
 //   // TODO; for K
 // }
 
+//TESTING CHRIS COMMITS
 router.get('/',function(req,res){
   // spotify_login();
   res.sendFile(path.join(__dirname+'/views/index.html'));
