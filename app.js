@@ -260,13 +260,20 @@ router.post('/create_user', function(req, res) {
 
 // Add someone to a room with synchro logic
 router.get('/join', function(req, res) {
-  var room_names = [
-    { name: "AJ's Room" },
-    { name: "Kei's Room" },
-    { name: "Dimitris's Room" }
-  ];
+  var room_names = []
+  Room.find({}, 'name', function(err, rooms) {
+    if (err) {
+      console.log(err);
+    } else {
+      for (var i = 0; i < rooms.length; i++) {
+        room_names.push(rooms[i].name);
+      }
+      console.log(room_names);
+      res.render(__dirname + '/views/join', {room_names: room_names});
+    }
+  });
 
-  res.render(__dirname + '/views/join', {room_names: room_names});
+
 });
 
 router.get('/playback', function(req, res) {
