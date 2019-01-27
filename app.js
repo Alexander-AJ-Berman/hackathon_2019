@@ -19,7 +19,7 @@ let client_secret = "fb6eb63063074d0bb69844de3a2a03c3";
 let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
-var rooms_to_apis = {};
+// var rooms_to_apis = {room5: [spotifyApi, chris_api, aj_api], room6: [spotifyApi, chris_api, aj_api]};
 
 let spotifyApi = new SpotifyWebApi({
   clientId: client_id,
@@ -36,9 +36,12 @@ let aj_api = new SpotifyWebApi({
   clientSecret: client_secret
 });
 
-apis_list : [spotifyApi, chris_api, aj_api];
+apis_list = [spotifyApi, chris_api, aj_api];
 
 let kei_access = '';
+let chris_access = 'BQBCPIwAIDxFC78fwwd6CrebRG_zRfpo_ORFsPHQ-ePlti-DxHtmrjF6cPdtBPcR_WegfahDlNSuSXb_-hIS98I5mBehMePE8M0qFxr2LdUh4JkavuveIrxQLoVjASkNB465AQGs2CbJC_wpYqhWnzvkuRo';
+let aj_access = 'BQD5yf5wTE2MVVxbg3f4UN0YxsqUYSwgylOKGBiZFLmAl88lxXfxQXcnbkAUXtxnQQQBUF8Wx2WewC9WWuIOXCaKHf_chXz9621oDB0W93AdVSwUsG0ztq31oLZQuBGRqdFoiVlmHudw1id-_1hXeGMf7zTj2Hbmq5MnfUj99Uy6IS8';
+
 
 function room_joined(room, new_user) {
   User.findOne({ 'name': new_user }, function (err, user) {
@@ -53,7 +56,7 @@ function room_joined(room, new_user) {
   });
 
 
-  
+
   //user ID
   // USER access
 }
@@ -83,7 +86,7 @@ app.get('/login', function(req, res) {
   // console.log(res.cookie(stateKey));
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email user-modify-playback-state';
+  var scope = 'user-read-private user-read-email user-modify-playback-state user-read-playback-state';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -91,7 +94,7 @@ app.get('/login', function(req, res) {
       scope: scope,
       redirect_uri: redirect_uri,
       state: state,
-      show_dialog: "true"
+      show_dialog: "false"
     }));
 });
 
@@ -197,64 +200,99 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
+function get_host_playback(host) {
+    console.log('get_host_playback');
+    // get host's spotify API data
 
+    //placeholder.
+    spotifyApi.getMyCurrentPlaybackState({
+      })
+      .then(function(data) {
+        // Output items
+        console.log("track num: ",data.body.item.track_number);
+        console.log("track uri: ",data.body.item.album.uri);
+        console.log("track progress: ",data.body.progress_ms);
+        console.log("timestamp: ",data.body.timestamp);
+
+        playback_data = {
+            'track_num': data.body.item.track_number,
+            'uri' : data.body.item.album.uri,
+            'progress' : data.body.progress_ms,
+            'unix_time' : data.body.timestamp
+        }
+
+        return playback_data;
+
+
+      }, function(err) {
+        console.log('Something went wrong in get_host_playback', err);
+      });
+
+}
 
 async function sync_songs(api_list) {
 
-    const promises = api_list.map(async userapi => {
-        console.log(userapi);
-        // request details from GitHub’s API with Axios
-        userapi.play(
-          {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
-        "position": 1} })
-          .then(function(data) {
-            console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
-          }, function(err) {
-            console.log('Something went wrong!', err);
-        });
-      })
+    var host_uri = '';
+    var host_track_num = '';
+    var host_track_progress = '';
+    var host_timestamp = '';
 
-      // wait until all promises resolve
-    const results = await Promise.all(promises)
-    console.log("SYNCHRONIZED ASYNCHRONOUSLY");
+    spotifyApi.getMyCurrentPlaybackState({
+      })
+      .then(async function(data) {
+        // Output items
+        console.log("track num: ",data.body.item.track_number);
+        console.log("track uri: ",data.body.item.album.uri);
+        console.log("track progress: ",data.body.progress_ms);
+        console.log("timestamp: ",data.body.timestamp);
+        console.log("MAC UNIX: " + Date.now());
+
+        host_track_num = data.body.item.track_number;
+        host_uri = data.body.item.album.uri;
+        host_track_progress = data.body.progress_ms;
+        host_timestamp = data.body.timestamp;
+
+        const promises = api_list.map(async userapi => {
+            console.log(userapi);
+            // request details from GitHub’s API with Axios
+            userapi.play(
+              {"context_uri": host_uri,  "offset" : {
+            "position": host_track_num-1}, "position_ms" :host_track_progress})
+              .then(function(data) {
+                console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
+              }, function(err) {
+                console.log('Something went wrong!', err);
+            });
+          })
+
+          // wait until all promises resolve
+        const results = await Promise.all(promises)
+        console.log("SYNCHRONIZED ASYNCHRONOUSLY");
+
+      }, function(err) {
+        console.log('Something went wrong in get_host_playback', err);
+      });
+
+    // console.log("NEW host uri: " + host_uri);
+
+
+
 }
 
 router.get('/omt', function(req,res) {
     console.log('onemoretime');
-    console.log('cess: ' + kei_access);
+    console.log('KEI Access: ' + kei_access);
     spotifyApi.setAccessToken(kei_access);
     chris_api.setAccessToken(chris_access);
     aj_api.setAccessToken(aj_access);
 
+    host_playback_data = get_host_playback('test');
+    // console.log(host_playback_data);
+
     sync_songs(apis_list);
-    //
-    // spotifyApi.play(
-    //   {"context_uri": "spotify:album:52flnRB4OGb1y3vEoUCwZD",  "offset": {
-    // "position": 0}})
-    //   .then(function(data) {
-    //     console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
-    //   }, function(err) {
-    //     console.log('Something went wrong!', err);
-    // });
-    //
-    // aj_api.play(
-    //   {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
-    // "position": 1} })
-    //   .then(function(data) {
-    //     console.log('__playing one more time!');
-    //   }, function(err) {
-    //     console.log('Something went wrong 4 aj!', err);
-    // });
-    //
-    //
-    // chris_api.play(
-    //   {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
-    // "position": 1} })
-    //   .then(function(data) {
-    //     console.log('__playing one more time!');
-    //   }, function(err) {
-    //     console.log('Something went wrong 4 aj!', err);
-    // });
+    sync_songs(apis_list);
+    sync_songs(apis_list);
+
 
 });
 
