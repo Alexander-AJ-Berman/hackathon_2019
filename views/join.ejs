@@ -28,13 +28,16 @@
 -->
 
 <html>
+  <meta></meta>
   <head></head>
   <body>
-    <ul>
-      <% room_names.forEach(function(room){ %>
-        <%= room.name %>
-        <br><br>
-      <% }) %>
-    </ul>
+      <form method="post" action="/select_room">
+        <% room_names.forEach(function(name) { %>
+          <%=name %><br>
+        <% }) %>
+          <input type="text" name="name"></input>
+          <br>
+          <input type="submit">Join room</input>
+    </form> 
   </body>
 </html>

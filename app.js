@@ -59,7 +59,6 @@ app.use(express.static(__dirname + '/public'))
    .use(cookieParser());
 
 app.get('/login', function(req, res) {
-
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
   console.log(res.cookie(stateKey));
@@ -111,7 +110,9 @@ app.get('/callback', function(req, res) {
       if (!error && response.statusCode === 200) {
 
         var access_token = body.access_token,
-            refresh_token = body.refresh_token;
+            refresh_token = body.refresh_token,
+            name = body.name,
+            id = body.id;
 
         // console.log(body);
         kei_access = body.access_token;
@@ -125,18 +126,28 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
+<<<<<<< HEAD
           console.log(body);
 
+=======
+          //console.log(body);
+          var newUser = new User({
+            name: body.display_name,
+            userID: body.id,
+            access_token: access_token,
+            refresh_token: refresh_token,
+          });
+        newUser.save();
+>>>>>>> 5d955ff1de47abb61d90b113465fbd54e8bbbbaa
         });
 
 
 
         // we can also pass the token to the browser to make requests from there
-        res.redirect('/#' +
-          querystring.stringify({
-            access_token: access_token,
-            refresh_token: refresh_token
-          }));
+        // CREATE USER WITH DATA
+        res.redirect('/choice');
+
+
       } else {
         res.redirect('/#' +
           querystring.stringify({
@@ -145,6 +156,11 @@ app.get('/callback', function(req, res) {
       }
     });
   }
+
+});
+
+app.post('/prompt_name', function(req, res) {
+  console.log(req.body.name);
 });
 
 app.get('/refresh_token', function(req, res) {
@@ -224,11 +240,12 @@ router.get('/spotifyLogin',function(req, res){
   //__dirname : It will resolve to your project folder.
 });
 
-router.get('/create', function(req, res){
-  res.sendFile(path.join(__dirname + '/views/create.html'));
+router.get('/create_room', function(req, res){
+  res.sendFile(path.join(__dirname + '/views/create_room.html'));
   // Continued logic for creating a room with database entries
 });
 
+<<<<<<< HEAD
 router.post('/create_user', function(req, res) {
 
 
@@ -249,11 +266,19 @@ router.post('/create_user', function(req, res) {
       }
     });
   newUser.save();
+=======
+router.get('/choice', function(req, res) {
+  res.sendFile(path.join(__dirname + '/views/choice.html'));
+});
+>>>>>>> 5d955ff1de47abb61d90b113465fbd54e8bbbbaa
 
+router.post('/create_room', function(req, res) {
+  var name = req.body.name;
   var pwd = req.body.pwd;
   var room_name = req.body.room_name;
-  var roomID = "room ID placeholder";
-  var users = ["AJ", "Kei", "Ali", "Dim", "C"];
+  // MAKEUP
+  var roomID = generateRandomString(8);
+  var users = [name];
 
   var newRoom = new Room({
     name: room_name,
@@ -267,7 +292,7 @@ router.post('/create_user', function(req, res) {
 });
 
 // Add someone to a room with synchro logic
-router.get('/join', function(req, res) {
+router.get('/join_room', function(req, res) {
   var room_names = []
   Room.find({}, 'name', function(err, rooms) {
     if (err) {
@@ -276,11 +301,27 @@ router.get('/join', function(req, res) {
       for (var i = 0; i < rooms.length; i++) {
         room_names.push(rooms[i].name);
       }
-      console.log(room_names);
       res.render(__dirname + '/views/join', {room_names: room_names});
     }
   });
 
+});
+
+// POST route handler
+router.post('/select_room', function(req, res) {
+  var user_IDs = [];
+  Room.findOne({ 'name': req.body.name }, function (err, room) {
+    if (err) {
+      console.log(err);
+    } else {
+      var users = room.users;
+      for (var i = 0; i < users.length; i++) {
+        user_IDs.push(users[i].name);
+      }
+      console.log(users);
+      console.log(user_IDs);
+    }
+  });
 });
 
 router.get('/playback', function(req, res) {
@@ -318,12 +359,7 @@ var userSchema = new mongoose.Schema({
   name: String,
   userID: String,
   access_token: String,
-  refresh_token: String,
-  song: {
-    name: String,
-    artist: String,
-    timestamp: String
-  }
+  refresh_token: String
 });
 
 // Create a room
