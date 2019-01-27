@@ -77,7 +77,7 @@ function room_joined(room, new_user) {
           //rooms_to_guestAPIs.curr_roomID = [100];
       } else{
 
-          room_guest_apis.foreach(function(r) {
+          room_guest_apis.forEach(function(r) {
               if (r.roomID == room.roomID){
                   r.api_list.push(new_api);
               }
@@ -286,7 +286,7 @@ async function sync_songs(roomID) {
     var room_guests
 
     // get list of guests
-    room_guest_apis.foreach(function(r) {
+    room_guest_apis.forEach(function(r) {
         if (r.roomID == room.roomID){
             room_guests = r;
         }
@@ -353,7 +353,7 @@ router.get('/omt', function(req,res) {
 
     host_playback_data = get_host_playback('test');
     // console.log(host_playback_data);
-    
+
     sync_songs(apis_list);
     sync_songs(apis_list);
     sync_songs(apis_list);
