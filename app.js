@@ -94,7 +94,12 @@ function room_joined(room, new_user) {
               roomID: room.roomID,
               api_list: [new_api] // TODO: remove host api from list?
           };
-          room_guest_apis.push(new_api);
+          room_guest_apis.push(curr_room);
+          console.log(">>ROOM GUEST APIS START");
+          console.log(room_guest_apis);
+          console.log(">>ROOM GUEST APIS END");
+
+
 
           //rooms_to_guestAPIs.curr_roomID = [100];
       } else{
@@ -320,12 +325,13 @@ async function sync_songs(roomID) {
     });
 
     console.log("\tROOM ID: " + roomID);
-    var room_guests
+    var room_guests_api_list;
 
     // get list of guests
     room_guest_apis.forEach(function(r) {
         if (r.roomID == roomID){
-            room_guests = r;
+            room_guests_api_list = r.api_list;
+            console.log("found other APIs");
         }
     });
 
@@ -333,7 +339,7 @@ async function sync_songs(roomID) {
     var host_track_num = '';
     var host_track_progress = '';
     var host_timestamp = '';
-    
+
     console.log(host_api);
     host_api.getMyCurrentPlaybackState({
       })
@@ -350,10 +356,10 @@ async function sync_songs(roomID) {
         host_track_progress = data.body.progress_ms;
         host_timestamp = data.body.timestamp;
 
-        const promises = api_list.map(async room_guests => {
+        const promises = room_guests_api_list.map(async room_guests => {
             console.log(room_guests);
             // request details from GitHub’s API with Axios
-            userapi.play(
+            room_guests.play(
               {"context_uri": host_uri,  "offset" : {
             "position": host_track_num-1}, "position_ms" :host_track_progress})
               .then(function(data) {
