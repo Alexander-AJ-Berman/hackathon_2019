@@ -46,7 +46,7 @@
 <!DOCTYPE html>
 <html>
  <head>
- <title>Intro to Node and MongoDB</title>
+ <title>Create a new listening room</title>
  <style>
  body, html {
    height: 100%;
@@ -87,21 +87,32 @@
    left: 50%;
    transform: translate(-50%, -50%);
    z-index: 2;
-   width: 80%;
+   width: 40%;
    padding: 20px;
    text-align: center;
  }
+
+ label,input {
+ display: inline-block;
+ position: relative;
+ width: 150px;
+ float: center;
+ margin-bottom: 10px;
+}
+
 
  </style>
  </head>
 
  <body>
- <h1>Create a new listening room</h1>
- <form method="post" action="/create_room">
- <label>Enter Your Name</label><br>
- <input type="text" name="name" placeholder="Enter host name..." required><br>
- <input type="text" name="room_name" placeholder="Enter room name" required><br>
- <input type="submit" value="Create room">
- </form>
+ <div class="bg-image"></div>
+ <div class="bg-text">
+     <form method="post" action="/create_room">
+         <label>Setup a new Listening Room</label><br>
+         <input type="text" name="name" placeholder="Enter host's name..." required><br>
+         <input type="text" name="room_name" placeholder="Enter room name..." required><br>
+         <input type="submit" value="Create room">
+    </form>
+ </div>
  </body>
 </html>
