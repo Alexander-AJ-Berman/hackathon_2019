@@ -38,6 +38,24 @@ apis_list = [spotifyApi, chris_api, aj_api];
 
 let kei_access = '';
 
+function room_joined(room, new_user) {
+  User.findOne({ 'name': new_user }, function (err, user) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(room.roomID);
+      console.log(user.access_token);
+      console.log(user.refresh_token);
+      console.log(user.userID);
+    }
+  });
+
+
+  
+  //user ID
+  // USER access
+}
+
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
@@ -125,7 +143,7 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          console.log(body);
+          //console.log(body);
           var newUser = new User({
             name: body.display_name,
             userID: body.id,
@@ -321,7 +339,7 @@ router.post('/select_room', function(req, res) {
       var users = room.users;
       users.push(req.body.display_name);
       room.set({ users: users});
-      console.log(users);
+      room_joined(room, req.body.display_name);
       res.render(__dirname + '/views/display_room', {users: users});
     }
   });
