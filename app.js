@@ -61,7 +61,7 @@ app.use(express.static(__dirname + '/public'))
 app.get('/login', function(req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
-  console.log(res.cookie(stateKey));
+  // console.log(res.cookie(stateKey));
 
   // your application requests authorization
   var scope = 'user-read-private user-read-email user-modify-playback-state';
@@ -126,10 +126,6 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-<<<<<<< HEAD
-          console.log(body);
-
-=======
           //console.log(body);
           var newUser = new User({
             name: body.display_name,
@@ -138,7 +134,6 @@ app.get('/callback', function(req, res) {
             refresh_token: refresh_token,
           });
         newUser.save();
->>>>>>> 5d955ff1de47abb61d90b113465fbd54e8bbbbaa
         });
 
 
@@ -245,32 +240,9 @@ router.get('/create_room', function(req, res){
   // Continued logic for creating a room with database entries
 });
 
-<<<<<<< HEAD
-router.post('/create_user', function(req, res) {
-
-
-  var userID = "user ID Placeholder";
-  var access_token = "access token placeholder";
-  var refresh_token = "refresh token placeholder";
-
-
-  var newUser = new User({
-      name: req.body.name,
-      userID: userID,
-      access_token: access_token,
-      refresh_token: refresh_token,
-      song: {
-        name: "One More Time",
-        artist: "Daft Punk",
-        timestamp: "00:00:00"
-      }
-    });
-  newUser.save();
-=======
 router.get('/choice', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/choice.html'));
 });
->>>>>>> 5d955ff1de47abb61d90b113465fbd54e8bbbbaa
 
 router.post('/create_room', function(req, res) {
   var name = req.body.name;
