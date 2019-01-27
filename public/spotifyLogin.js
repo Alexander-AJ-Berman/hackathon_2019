@@ -1,6 +1,23 @@
 // for SYNCHRONIZEDAIRPODSPARTY
 
+
+
+
 $(document).ready(() => {
+    room_id = get roomID from document
+
+    syncMap = {
+        roomID: room_id
+    };
+
+    let syncParams = $.param(syncMap);
+
+	$("#sync").click(() => {
+		$.post('/sync', syncParams);
+	});
+
+
+
 	let queryMap =
 	{
         client_id: "8fdf389a4342424b8c52c8e8456653ae",
