@@ -46,17 +46,73 @@
 <!DOCTYPE html>
 <html>
  <head>
- <title>Intro to Node and MongoDB</title>
+ <title>Create a new listening room</title>
+ <style>
+ body, html {
+   height: 100%;
+   margin: 0;
+   font-family: Arial, Helvetica, sans-serif;
+ }
+
+ * {
+   box-sizing: border-box;
+ }
+
+ .bg-image {
+   /* The image used */
+   background-image: url("https://images.freecreatives.com/wp-content/uploads/2016/01/Night-Fall-at-Lake-Aurora-iPhone-6-Background.jpg");
+
+   /* Add the blur effect */
+   filter: blur(8px);
+   -webkit-filter: blur(8px);
+
+   /* Full height */
+   height: 100%;
+
+   /* Center and scale the image nicely */
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size: cover;
+ }
+
+ /* Position text in the middle of the page/image */
+ .bg-text {
+   background-color: rgb(0,0,0); /* Fallback color */
+   background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+   color: white;
+   font-weight: bold;
+   border: 3px solid #f1f1f1;
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   z-index: 2;
+   width: 40%;
+   padding: 20px;
+   text-align: center;
+ }
+
+ label,input {
+ display: inline-block;
+ position: relative;
+ width: 150px;
+ float: center;
+ margin-bottom: 10px;
+}
+
+
+ </style>
  </head>
- 
+
  <body>
- <h1>Into to Node and MongoDB</h1>
- <form method="post" action="/create_room">
- <label>Enter Your Name</label><br>
- <input type="text" name="name" placeholder="Enter name..." required><br>
- <input type="text" name="pwd" placeholder="Enter room password..." required><br>
- <input type="text" name="room_name" placeholder="Enter room name" required><br>
- <input type="submit" value="Create room">
- </form>
+ <div class="bg-image"></div>
+ <div class="bg-text">
+     <form method="post" action="/create_room">
+         <label>Setup a new Listening Room</label><br>
+         <input type="text" name="name" placeholder="Enter host's name..." required><br>
+         <input type="text" name="room_name" placeholder="Enter room name..." required><br>
+         <input type="submit" value="Create room">
+    </form>
+ </div>
  </body>
 </html>
