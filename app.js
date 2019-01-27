@@ -35,10 +35,10 @@ let aj_api = new SpotifyWebApi({
 });
 
 let kei_access = '';
-// let aj_access = 'BQBSyywnCKzATbX97N6Jx3xfz2WZEt30gSjoNnd9CG9Q8v58e2oI8zKh0scVotxpv5PcT2u0hpLN9172mJBBye85hV3R9rrlS74Lb_7oInSVAsCUTC5xrRMQkZYomzDitJisapvbH4Tn7yiMSd97nlFm4QTTctHPcK7O';
-let chris_access = 'BQDPCVlEFHh75lokgjb_ObyvH1ZHvDrvgR6lwFeKbnVORo_0w1pozDvjgclc_zn-2BOimXsGUNC9FY-PWlxGADP4--AT0MlGOL8Gq-N55PcSth_PIRujKMdE9JqsBI94NzGzK7g1G9Z6UA5pKcvcpkhY2CQ';
+let chris_access = '';
+let aj_access = '';
 
-let aj_access = 'BQCFCKUuayrWy3B1acGtvCpKOv0dxvO8uGrExoaw0Xak6pyqj-m1MlAIku9Cdftycl0qIHL6Oxt8lZWj45wfqWSHC5Ymn35sqwHln86I_xHzdkX7ZTmo5LhC5CFsRvMUbv-8TWgri7cG-abeGm1bb5j027qP4ray6GQ7SU9lBQ';
+
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
@@ -272,7 +272,6 @@ router.get('/join', function(req, res) {
       res.render(__dirname + '/views/join', {room_names: room_names});
     }
   });
-
 
 });
 
