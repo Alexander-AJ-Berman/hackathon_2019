@@ -134,15 +134,11 @@ app.get('/callback', function(req, res) {
             refresh_token: refresh_token,
           });
         newUser.save();
-        });
-
-
 
         // we can also pass the token to the browser to make requests from there
         // CREATE USER WITH DATA
-        res.redirect('/choice');
-
-
+        res.redirect('/choice?name=' + body.display_name);
+        });
       } else {
         res.redirect('/#' +
           querystring.stringify({
@@ -242,6 +238,7 @@ router.get('/create_room', function(req, res){
 });
 
 router.get('/choice', function(req, res) {
+  //req.query.name
   res.sendFile(path.join(__dirname + '/views/choice.html'));
 });
 
@@ -281,12 +278,10 @@ router.get('/join_room', function(req, res) {
 
 // POST route handler
 router.post('/select_room', function(req, res) {
-  
   Room.findOne({ 'name': req.body.name }, function (err, room) {
     if (err) {
       console.log(err);
     } else {
-      console.log(room);
       var users = room.users;
       console.log(users);
       res.render(__dirname + '/views/display_room', {users: users});
