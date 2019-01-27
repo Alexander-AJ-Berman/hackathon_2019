@@ -47,8 +47,21 @@ function room_joined(room, new_user) {
       console.log(user.access_token);
       console.log(user.refresh_token);
       console.log(user.userID);
+      var host_id = room_to_host(room);
+      console.log(host_id);
     }
   });
+
+function room_to_host(room) {
+  var host_name = room.users[0];
+  User.findOne({ 'name': host_name }, function (err, user) {
+    if (err) {
+      console.log(err);
+    } else {
+      return user.userID;
+    }
+  });
+}
 
 
   
