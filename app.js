@@ -19,7 +19,7 @@ let client_secret = "fb6eb63063074d0bb69844de3a2a03c3";
 let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
-var rooms_to_hostAPI = {};
+var rooms_to_hostAPI = [];
 var room_guest_apis = [];
 
 // var rooms_to_guestAPIs = {
@@ -47,13 +47,14 @@ var room_guest_apis = [];
 // let kei_access = '';
 
 function room_joined(room, new_user) {
+    console.log('room joined');
   User.findOne({ 'name': new_user }, function (err, user) {
     if (err) {
       console.log(err);
     } else {
         console.log(user);
       console.log("ROOM ID: " + room.roomID);
-      curr_roomID = room.roomID;
+      var curr_roomID = room.roomID;
       console.log(user.access_token);
       console.log(user.refresh_token);
       console.log(user.userID);
@@ -64,22 +65,46 @@ function room_joined(room, new_user) {
           clientId: client_id,
           clientSecret: client_secret
       });
-      new_api.setAccessToken(user.access_token);
 
-      if (!room.roomID in rooms_to_hostAPI){
-          rooms_to_hostAPI.curr_roomID = new_api;
+      new_api.setAccessToken(user.access_token);
+      console.log("_____________");
+      console.log(new_api);
+      console.log(room.roomID);
+      console.log(rooms_to_hostAPI);
+
+      var found = false;
+      rooms_to_hostAPI.forEach(function(r) {
+          if (r.roomID == room.roomID){
+              found = true;
+          }
+      });
+
+      if (!found) {
+          console.log("adding new host");
+
+          //rooms_to_hostAPI.curr_roomID = new_api;
+          // rooms_to_hostAPI
+          var curr_host_data = {
+              roomID: room.roomID,
+              api: new_api
+          }
+          rooms_to_hostAPI.push(curr_host_data);
+
           var curr_room = {
               roomID: room.roomID,
               api_list: [new_api] // TODO: remove host api from list?
           };
-          room_guest_apis.push(curr_room);
+          room_guest_apis.push(new_api);
 
           //rooms_to_guestAPIs.curr_roomID = [100];
       } else{
-
+          console.log(rooms_to_hostAPI);
+          console.log(room_guest_apis);
+          console.log("adding new guest");
           room_guest_apis.forEach(function(r) {
               if (r.roomID == room.roomID){
                   r.api_list.push(new_api);
+                  console.log(room_guest_apis);
               }
           });
           //
@@ -247,47 +272,59 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
-function get_host_playback(host) {
-    console.log('get_host_playback');
-    // get host's spotify API data
-
-    //placeholder.
-    spotifyApi.getMyCurrentPlaybackState({
-      })
-      .then(function(data) {
-        // Output items
-        console.log("track num: ",data.body.item.track_number);
-        console.log("track uri: ",data.body.item.album.uri);
-        console.log("track progress: ",data.body.progress_ms);
-        console.log("timestamp: ",data.body.timestamp);
-
-        playback_data = {
-            'track_num': data.body.item.track_number,
-            'uri' : data.body.item.album.uri,
-            'progress' : data.body.progress_ms,
-            'unix_time' : data.body.timestamp
-        }
-
-        return playback_data;
-
-
-      }, function(err) {
-        console.log('Something went wrong in get_host_playback', err);
-      });
-
-}
+// function get_host_playback(host) {
+//     console.log('get_host_playback');
+//     // get host's spotify API data
+//
+//     //placeholder.
+//     spotifyApi.getMyCurrentPlaybackState({
+//       })
+//       .then(function(data) {
+//         // Output items
+//         console.log("track num: ",data.body.item.track_number);
+//         console.log("track uri: ",data.body.item.album.uri);
+//         console.log("track progress: ",data.body.progress_ms);
+//         console.log("timestamp: ",data.body.timestamp);
+//
+//         playback_data = {
+//             'track_num': data.body.item.track_number,
+//             'uri' : data.body.item.album.uri,
+//             'progress' : data.body.progress_ms,
+//             'unix_time' : data.body.timestamp
+//         }
+//
+//         return playback_data;
+//
+//
+//       }, function(err) {
+//         console.log('Something went wrong in get_host_playback', err);
+//       });
+//
+// }
 
 async function sync_songs(roomID) {
 
     // get host
     // get room
+    console.log("rooms_to_hostAPI:");
+    console.log(rooms_to_hostAPI);
 
-    var host_api = rooms_to_hostAPI.roomID;
+
+    var host_api;
+    rooms_to_hostAPI.forEach(function(r) {
+        if (r.roomID == roomID){
+            host_api = r.api;
+            console.log("found host API");
+            console.log(host_api);
+        }
+    });
+
+    console.log("\tROOM ID: " + roomID);
     var room_guests
 
     // get list of guests
     room_guest_apis.forEach(function(r) {
-        if (r.roomID == room.roomID){
+        if (r.roomID == roomID){
             room_guests = r;
         }
     });
@@ -296,8 +333,9 @@ async function sync_songs(roomID) {
     var host_track_num = '';
     var host_track_progress = '';
     var host_timestamp = '';
-
-    spotifyApi.getMyCurrentPlaybackState({
+    
+    console.log(host_api);
+    host_api.getMyCurrentPlaybackState({
       })
       .then(async function(data) {
         // Output items
@@ -330,7 +368,7 @@ async function sync_songs(roomID) {
         console.log("SYNCHRONIZED ASYNCHRONOUSLY");
 
       }, function(err) {
-        console.log('Something went wrong in get_host_playback', err);
+        console.log('Something went wrong in get current playback state', err);
       });
 
     // console.log("NEW host uri: " + host_uri);
@@ -338,27 +376,28 @@ async function sync_songs(roomID) {
 }
 
 router.post('/sync', function(req,res){
-    console.log('Syncing room ' +req.roomID);
-    sync_songs(req.roomID);
+    console.log('======Syncing room ' +req.body.roomID);
+    console.log(rooms_to_hostAPI);
+    sync_songs(req.body.roomID);
 });
 
-router.get('/omt', function(req,res) {
-
-    console.log('SYNCING');
-
-    console.log('KEI Access: ' + kei_access);
-    spotifyApi.setAccessToken(kei_access);
-    chris_api.setAccessToken(chris_access);
-    aj_api.setAccessToken(aj_access);
-
-    host_playback_data = get_host_playback('test');
-    // console.log(host_playback_data);
-
-    sync_songs(apis_list);
-    sync_songs(apis_list);
-    sync_songs(apis_list);
-
-});
+// router.get('/omt', function(req,res) {
+//
+//     console.log('SYNCING');
+//
+//     console.log('KEI Access: ' + kei_access);
+//     spotifyApi.setAccessToken(kei_access);
+//     chris_api.setAccessToken(chris_access);
+//     aj_api.setAccessToken(aj_access);
+//
+//     host_playback_data = get_host_playback('test');
+//     // console.log(host_playback_data);
+//
+//     sync_songs(apis_list);
+//     sync_songs(apis_list);
+//     sync_songs(apis_list);
+//
+// });
 
 // // Handles spotify login and Auth
 // function spotify_login() {

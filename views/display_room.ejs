@@ -7,7 +7,7 @@
         <% users.forEach(function(user) { %>
           <%=user %><br>
         <% }) %>
-    </form> 
+    </form>
   </body>
 </html>
 -->
@@ -30,14 +30,14 @@ body, html {
 .bg-image {
   /* The image used */
   background-image: url("https://images.freecreatives.com/wp-content/uploads/2016/01/Night-Fall-at-Lake-Aurora-iPhone-6-Background.jpg");
-  
+
   /* Add the blur effect */
   filter: blur(8px);
   -webkit-filter: blur(8px);
-  
+
   /* Full height */
-  height: 100%; 
-  
+  height: 100%;
+
   /* Center and scale the image nicely */
   background-position: center;
   background-repeat: no-repeat;
@@ -82,12 +82,12 @@ button {
   border: 1px solid white;
   color: #fff;
   box-shadow: 0px 0px 0px rgba( 15, 165, 60, 0.1 );
-  
+
   -webkit-transform: translateZ(0);
      -moz-transform: translateZ(0);
       -ms-transform: translateZ(0);
           transform: translateZ(0);
-  
+
   -webkit-transition: all 0.2s ease;
      -moz-transition: all 0.2s ease;
       -ms-transition: all 0.2s ease;
@@ -97,7 +97,7 @@ button {
 button:hover {
   top: -10px;
   box-shadow: 0px 10px 10px white;
-  
+
   -webkit-transform: rotateX(20deg);
      -moz-transform: rotateX(20deg);
       -ms-transform: rotateX(20deg);
@@ -114,15 +114,23 @@ button:active {
 </head>
 <body>
 
-<div class="bg-image"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="sync_frontend.js"></script>
 
+<div class="bg-image"></div>
+<p id ='thisroomid'><%= roomID %><p>
 <div class="bg-text">
-  
+    <button class="button" id="sync">SYNC</button>
+
+
     <h3>Members: <%= roomID %></h3>
     <% users.forEach(function(user) { %>
       <%=user %><br>
     <% }) %>
 </div>
+
+<button class="button" id="sync">SYNC</button>
+
 
 </body>
 </html>
