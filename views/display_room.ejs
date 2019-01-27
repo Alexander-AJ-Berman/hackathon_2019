@@ -117,7 +117,8 @@ button:active {
 <div class="bg-image"></div>
 
 <div class="bg-text">
-    <h3>Members:</h3>
+  
+    <h3>Members: <%= roomID %></h3>
     <% users.forEach(function(user) { %>
       <%=user %><br>
     <% }) %>

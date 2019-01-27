@@ -428,6 +428,7 @@ router.post('/select_room', function(req, res) {
       console.log(err);
     } else {
       var users = room.users;
+      var roomID = room.roomID;
       users.push(req.body.display_name);
       room.set({ users: users});
       room_joined(room, req.body.display_name);
@@ -439,7 +440,7 @@ router.post('/select_room', function(req, res) {
           user.roomID = room.roomID;
         }
       });
-      res.render(__dirname + '/views/display_room', {users: users});
+      res.render(__dirname + '/views/display_room', {users: users, roomID: roomID});
     }
   });
 });
