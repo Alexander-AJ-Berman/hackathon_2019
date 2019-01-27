@@ -375,9 +375,9 @@ app.use('omt', router);
 app.use('/', router);
 app.use('/create', router);
 app.use('join', router);
-app.listen(process.env.port || 3000);
+app.listen(process.env.PORT || 3000);
 
-console.log("If you own airpods, I'm listening on 3000...");
+console.log("If you own airpods, I'm listening...");
 
 db.once('open', function() {
   console.log('Connected to DB...');
