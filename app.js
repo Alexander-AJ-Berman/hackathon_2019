@@ -18,25 +18,27 @@ let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "fb6eb63063074d0bb69844de3a2a03c3";
 let redirect_uri = 'https://synchronizedairpodplayer.herokuapp.com/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
+var rooms_to_hostAPI = {};
+var rooms_to_guestAPIs = {};
 
-let spotifyApi = new SpotifyWebApi({
-  clientId: client_id,
-  clientSecret: client_secret
-});
-
-let chris_api = new SpotifyWebApi({
-  clientId: client_id,
-  clientSecret: client_secret
-});
-
-let aj_api = new SpotifyWebApi({
-  clientId: client_id,
-  clientSecret: client_secret
-});
-
-apis_list = [spotifyApi, chris_api, aj_api];
-
-let kei_access = '';
+// let spotifyApi = new SpotifyWebApi({
+//   clientId: client_id,
+//   clientSecret: client_secret
+// });
+//
+// let chris_api = new SpotifyWebApi({
+//   clientId: client_id,
+//   clientSecret: client_secret
+// });
+//
+// let aj_api = new SpotifyWebApi({
+//   clientId: client_id,
+//   clientSecret: client_secret
+// });
+//
+// apis_list = [spotifyApi, chris_api, aj_api];
+//
+// let kei_access = '';
 
 function room_joined(room, new_user) {
   User.findOne({ 'name': new_user }, function (err, user) {
@@ -47,24 +49,36 @@ function room_joined(room, new_user) {
       console.log(user.access_token);
       console.log(user.refresh_token);
       console.log(user.userID);
-      var host_id = room_to_host(room);
+//      var host_id = room_to_host(room);
       console.log(host_id);
-    }
+
+      let new_api = new SpotifyWebApi({
+          clientId: client_id,
+          clientSecret: client_secret
+      });
+      new_api.setAccessToken(user.access_token);
+
+      if (!rooms_to_hostAPI.room.roomID){
+          rooms_to_hostAPI.room.roomID = new_api;
+          rooms_to_guestAPIs.room.roomID = [];
+      } else{
+          rooms_to_guestAPIs.room.roomID.push(new_api);
+      }
   });
 
-function room_to_host(room) {
-  var host_name = room.users[0];
-  User.findOne({ 'name': host_name }, function (err, user) {
-    if (err) {
-      console.log(err);
-    } else {
-      return user.userID;
-    }
-  });
-}
+// function room_to_host(room) {
+//   var host_name = room.users[0];
+//   User.findOne({ 'name': host_name }, function (err, user) {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       return user.userID;
+//     }
+//   });
+// }
 
 
-  
+
   //user ID
   // USER access
 }
@@ -365,7 +379,7 @@ router.post('/select_room', function(req, res) {
       res.render(__dirname + '/views/display_room', {users: users});
     }
   });
-  
+
 });
 
 router.get('/playback', function(req, res) {
