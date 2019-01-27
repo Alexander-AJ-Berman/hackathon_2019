@@ -59,7 +59,6 @@ app.use(express.static(__dirname + '/public'))
    .use(cookieParser());
 
 app.get('/login', function(req, res) {
-
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
 
@@ -109,7 +108,9 @@ app.get('/callback', function(req, res) {
       if (!error && response.statusCode === 200) {
 
         var access_token = body.access_token,
-            refresh_token = body.refresh_token;
+            refresh_token = body.refresh_token,
+            name = body.name,
+            id = body.id;
 
         kei_access = body.access_token;
 
@@ -121,15 +122,21 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          console.log(body);
+          //console.log(body);
+          var newUser = new User({
+            name: body.display_name,
+            userID: body.id,
+            access_token: access_token,
+            refresh_token: refresh_token,
+          });
+        newUser.save();
         });
 
         // we can also pass the token to the browser to make requests from there
-        res.redirect('/#' +
-          querystring.stringify({
-            access_token: access_token,
-            refresh_token: refresh_token
-          }));
+        // CREATE USER WITH DATA
+        res.redirect('/choice');
+        
+        
       } else {
         res.redirect('/#' +
           querystring.stringify({
@@ -138,6 +145,11 @@ app.get('/callback', function(req, res) {
       }
     });
   }
+  
+});
+
+app.post('/prompt_name', function(req, res) {
+  console.log(req.body.name);
 });
 
 app.get('/refresh_token', function(req, res) {
@@ -217,35 +229,22 @@ router.get('/spotifyLogin',function(req, res){
   //__dirname : It will resolve to your project folder.
 });
 
-router.get('/create', function(req, res){
-  res.sendFile(path.join(__dirname + '/views/create.html'));
+router.get('/create_room', function(req, res){
+  res.sendFile(path.join(__dirname + '/views/create_room.html'));
   // Continued logic for creating a room with database entries
 });
 
-router.post('/create_user', function(req, res) {
+router.get('/choice', function(req, res) {
+  res.sendFile(path.join(__dirname + '/views/choice.html'));
+});
 
-  var userID = "user ID Placeholder";
-  var access_token = "access token placeholder";
-  var refresh_token = "refresh token placeholder";
-
-
-  var newUser = new User({
-      name: req.body.name,
-      userID: userID,
-      access_token: access_token,
-      refresh_token: refresh_token,
-      song: {
-        name: "One More Time",
-        artist: "Daft Punk",
-        timestamp: "00:00:00"
-      }
-    });
-  newUser.save();
-
+router.post('/create_room', function(req, res) {
+  var name = req.body.name;
   var pwd = req.body.pwd;
   var room_name = req.body.room_name;
+  // MAKEUP
   var roomID = "room ID placeholder";
-  var users = ["AJ", "Kei", "Ali", "Dim", "C"];
+  var users = [name];
 
   var newRoom = new Room({
     name: room_name,
@@ -259,7 +258,7 @@ router.post('/create_user', function(req, res) {
 });
 
 // Add someone to a room with synchro logic
-router.get('/join', function(req, res) {
+router.get('/join_room', function(req, res) {
   var room_names = []
   Room.find({}, 'name', function(err, rooms) {
     if (err) {
@@ -326,12 +325,7 @@ var userSchema = new mongoose.Schema({
   name: String,
   userID: String,
   access_token: String,
-  refresh_token: String,
-  song: {
-    name: String,
-    artist: String,
-    timestamp: String
-  }
+  refresh_token: String
 });
 
 // Create a room
