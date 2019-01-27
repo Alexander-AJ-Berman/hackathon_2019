@@ -19,6 +19,8 @@ let client_secret = "fb6eb63063074d0bb69844de3a2a03c3";
 let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
+var rooms_to_apis = {};
+
 let spotifyApi = new SpotifyWebApi({
   clientId: client_id,
   clientSecret: client_secret
@@ -34,7 +36,7 @@ let aj_api = new SpotifyWebApi({
   clientSecret: client_secret
 });
 
-apis_list = [spotifyApi, chris_api, aj_api];
+apis_list : [spotifyApi, chris_api, aj_api];
 
 let kei_access = '';
 
@@ -179,8 +181,6 @@ app.get('/refresh_token', function(req, res) {
 
 
 
-
-
 async function sync_songs(api_list) {
 
     const promises = api_list.map(async userapi => {
@@ -198,18 +198,7 @@ async function sync_songs(api_list) {
 
       // wait until all promises resolve
     const results = await Promise.all(promises)
-
-    // async.map(api_list, function(user_api, done) {
-    // // for each product, update its DB entry
-    //     user_api.play(
-    //         {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {"position": 1}, "position_ms" : 100000 })
-    //         .then(function(data) {
-    //             console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
-    //         }).exec(done);
-    //     }, function(err) {
-    //     console.log('Something went wrong!', err);
-    // });
-
+    console.log("SYNCHRONIZED ASYNCHRONOUSLY");
 }
 
 router.get('/omt', function(req,res) {
@@ -325,7 +314,7 @@ router.post('/select_room', function(req, res) {
       res.render(__dirname + '/views/display_room', {users: users});
     }
   });
-  
+
 });
 
 router.get('/playback', function(req, res) {
