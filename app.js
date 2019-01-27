@@ -16,7 +16,7 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "fb6eb63063074d0bb69844de3a2a03c3";
-let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
+let redirect_uri = 'https://synchronizedairpodplayer.herokuapp.com/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 var rooms_to_hostAPI = {};
 var rooms_to_guestAPIs = {};
@@ -389,9 +389,9 @@ app.use('omt', router);
 app.use('/', router);
 app.use('/create', router);
 app.use('join', router);
-app.listen(process.env.port || 3000);
+app.listen(process.env.PORT || 3000);
 
-console.log("If you own airpods, I'm listening on 3000...");
+console.log("If you own airpods, I'm listening...");
 
 db.once('open', function() {
   console.log('Connected to DB...');
