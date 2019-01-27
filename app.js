@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var db = mongoose.connection;
 const router = express.Router();
 var bodyParser = require('body-parser');
+var async = require('async');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -28,16 +29,14 @@ let chris_api = new SpotifyWebApi({
   clientSecret: client_secret
 });
 
-
 let aj_api = new SpotifyWebApi({
   clientId: client_id,
   clientSecret: client_secret
 });
 
-let kei_access = '';
-let chris_access = '';
-let aj_access = '';
+apis_list = [spotifyApi, chris_api, aj_api];
 
+let kei_access = '';
 
 /**
  * Generates a random string containing numbers and letters
@@ -126,7 +125,7 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          //console.log(body);
+          console.log(body);
           var newUser = new User({
             name: body.display_name,
             userID: body.id,
@@ -182,40 +181,77 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
+
+
+
+
+async function sync_songs(api_list) {
+
+    const promises = api_list.map(async userapi => {
+        console.log(userapi);
+        // request details from GitHub’s API with Axios
+        userapi.play(
+          {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
+        "position": 1} })
+          .then(function(data) {
+            console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
+          }, function(err) {
+            console.log('Something went wrong!', err);
+        });
+      })
+
+      // wait until all promises resolve
+    const results = await Promise.all(promises)
+
+    // async.map(api_list, function(user_api, done) {
+    // // for each product, update its DB entry
+    //     user_api.play(
+    //         {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {"position": 1}, "position_ms" : 100000 })
+    //         .then(function(data) {
+    //             console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
+    //         }).exec(done);
+    //     }, function(err) {
+    //     console.log('Something went wrong!', err);
+    // });
+
+}
+
 router.get('/omt', function(req,res) {
     console.log('onemoretime');
-    console.log('kei_access: ' + kei_access);
+    console.log('cess: ' + kei_access);
     spotifyApi.setAccessToken(kei_access);
     chris_api.setAccessToken(chris_access);
     aj_api.setAccessToken(aj_access);
 
-    spotifyApi.play(
-      {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
-    "position": 1}, "position_ms" : 100000 })
-      .then(function(data) {
-        console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
-      }, function(err) {
-        console.log('Something went wrong!', err);
-    });
-
-    aj_api.play(
-      {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
-    "position": 1} })
-      .then(function(data) {
-        console.log('__playing one more time!');
-      }, function(err) {
-        console.log('Something went wrong 4 aj!', err);
-    });
-
-
-    chris_api.play(
-      {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
-    "position": 1} })
-      .then(function(data) {
-        console.log('__playing one more time!');
-      }, function(err) {
-        console.log('Something went wrong 4 aj!', err);
-    });
+    sync_songs(apis_list);
+    //
+    // spotifyApi.play(
+    //   {"context_uri": "spotify:album:52flnRB4OGb1y3vEoUCwZD",  "offset": {
+    // "position": 0}})
+    //   .then(function(data) {
+    //     console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
+    //   }, function(err) {
+    //     console.log('Something went wrong!', err);
+    // });
+    //
+    // aj_api.play(
+    //   {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
+    // "position": 1} })
+    //   .then(function(data) {
+    //     console.log('__playing one more time!');
+    //   }, function(err) {
+    //     console.log('Something went wrong 4 aj!', err);
+    // });
+    //
+    //
+    // chris_api.play(
+    //   {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
+    // "position": 1} })
+    //   .then(function(data) {
+    //     console.log('__playing one more time!');
+    //   }, function(err) {
+    //     console.log('Something went wrong 4 aj!', err);
+    // });
 
 });
 
