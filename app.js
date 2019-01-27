@@ -77,7 +77,7 @@ function room_joined(room, new_user) {
           //rooms_to_guestAPIs.curr_roomID = [100];
       } else{
 
-          room_guest_apis.foreach(function(r) {
+          room_guest_apis.forEach(function(r) {
               if (r.roomID == room.roomID){
                   r.api_list.push(new_api);
               }
@@ -140,7 +140,7 @@ app.get('/login', function(req, res) {
       scope: scope,
       redirect_uri: redirect_uri,
       state: state,
-      show_dialog: "false"
+      show_dialog: "true"
     }));
 });
 
@@ -286,7 +286,7 @@ async function sync_songs(roomID) {
     var room_guests
 
     // get list of guests
-    room_guest_apis.foreach(function(r) {
+    room_guest_apis.forEach(function(r) {
         if (r.roomID == room.roomID){
             room_guests = r;
         }
@@ -353,7 +353,7 @@ router.get('/omt', function(req,res) {
 
     host_playback_data = get_host_playback('test');
     // console.log(host_playback_data);
-    
+
     sync_songs(apis_list);
     sync_songs(apis_list);
     sync_songs(apis_list);
@@ -428,6 +428,7 @@ router.post('/select_room', function(req, res) {
       console.log(err);
     } else {
       var users = room.users;
+      var roomID = room.roomID;
       users.push(req.body.display_name);
       room.set({ users: users});
       room_joined(room, req.body.display_name);
@@ -439,7 +440,7 @@ router.post('/select_room', function(req, res) {
           user.roomID = room.roomID;
         }
       });
-      res.render(__dirname + '/views/display_room', {users: users});
+      res.render(__dirname + '/views/display_room', {users: users, roomID: roomID});
     }
   });
 });
