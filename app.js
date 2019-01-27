@@ -46,7 +46,7 @@ var room_guest_apis = [];
 //
 // let kei_access = ''; 
 
-function room_joined(room, new_user) {
+function room_joined(room, new_user)  {
     console.log('room joined');
   User.findOne({ 'name': new_user }, function (err, user) {
     if (err) {
