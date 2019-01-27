@@ -19,42 +19,88 @@ let client_secret = "fb6eb63063074d0bb69844de3a2a03c3";
 let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
-// var rooms_to_apis = {room5: [spotifyApi, chris_api, aj_api], room6: [spotifyApi, chris_api, aj_api]};
+var rooms_to_hostAPI = {};
+var room_guest_apis = [];
 
-let spotifyApi = new SpotifyWebApi({
-  clientId: client_id,
-  clientSecret: client_secret
-});
+// var rooms_to_guestAPIs = {
+//     roomID: 0,
+//     api_list: []
+// };
 
-let chris_api = new SpotifyWebApi({
-  clientId: client_id,
-  clientSecret: client_secret
-});
-
-let aj_api = new SpotifyWebApi({
-  clientId: client_id,
-  clientSecret: client_secret
-});
-
-apis_list = [spotifyApi, chris_api, aj_api];
-
-let kei_access = '';
-let chris_access = 'BQBCPIwAIDxFC78fwwd6CrebRG_zRfpo_ORFsPHQ-ePlti-DxHtmrjF6cPdtBPcR_WegfahDlNSuSXb_-hIS98I5mBehMePE8M0qFxr2LdUh4JkavuveIrxQLoVjASkNB465AQGs2CbJC_wpYqhWnzvkuRo';
-let aj_access = 'BQD5yf5wTE2MVVxbg3f4UN0YxsqUYSwgylOKGBiZFLmAl88lxXfxQXcnbkAUXtxnQQQBUF8Wx2WewC9WWuIOXCaKHf_chXz9621oDB0W93AdVSwUsG0ztq31oLZQuBGRqdFoiVlmHudw1id-_1hXeGMf7zTj2Hbmq5MnfUj99Uy6IS8';
-
+// let spotifyApi = new SpotifyWebApi({
+//   clientId: client_id,
+//   clientSecret: client_secret
+// });
+//
+// let chris_api = new SpotifyWebApi({
+//   clientId: client_id,
+//   clientSecret: client_secret
+// });
+//
+// let aj_api = new SpotifyWebApi({
+//   clientId: client_id,
+//   clientSecret: client_secret
+// });
+//
+// apis_list = [spotifyApi, chris_api, aj_api];
+//
+// let kei_access = '';
 
 function room_joined(room, new_user) {
   User.findOne({ 'name': new_user }, function (err, user) {
     if (err) {
       console.log(err);
     } else {
-      console.log(room.roomID);
+        console.log(user);
+      console.log("ROOM ID: " + room.roomID);
+      curr_roomID = room.roomID;
       console.log(user.access_token);
       console.log(user.refresh_token);
       console.log(user.userID);
-    }
-  });
+     // var host_id = room_to_host(room);
+      // console.log(user.host_id);
 
+      var new_api = new SpotifyWebApi({
+          clientId: client_id,
+          clientSecret: client_secret
+      });
+      new_api.setAccessToken(user.access_token);
+
+      if (!room.roomID in rooms_to_hostAPI){
+          rooms_to_hostAPI.curr_roomID = new_api;
+          var curr_room = {
+              roomID: room.roomID,
+              api_list: [new_api] // TODO: remove host api from list?
+          };
+          room_guest_apis.push(curr_room);
+
+          //rooms_to_guestAPIs.curr_roomID = [100];
+      } else{
+
+          room_guest_apis.foreach(function(r) {
+              if (r.roomID == room.roomID){
+                  r.api_list.push(new_api);
+              }
+          });
+          //
+          // console.log("CURR ROOMID: " + curr_roomID);
+          // console.log(curr_roomID);
+          // rooms_to_guestAPIs.api_list.push(new_api);
+      }
+  }
+
+
+});
+// function room_to_host(room) {
+//   var host_name = room.users[0];
+//   User.findOne({ 'name': host_name }, function (err, user) {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       return user.userID;
+//     }
+//   });
+// }
 
 
   //user ID
@@ -230,7 +276,20 @@ function get_host_playback(host) {
 
 }
 
-async function sync_songs(api_list) {
+async function sync_songs(roomID) {
+
+    // get host
+    // get room
+
+    var host_api = rooms_to_hostAPI.roomID;
+    var room_guests
+
+    // get list of guests
+    room_guest_apis.foreach(function(r) {
+        if (r.roomID == room.roomID){
+            room_guests = r;
+        }
+    });
 
     var host_uri = '';
     var host_track_num = '';
@@ -252,8 +311,8 @@ async function sync_songs(api_list) {
         host_track_progress = data.body.progress_ms;
         host_timestamp = data.body.timestamp;
 
-        const promises = api_list.map(async userapi => {
-            console.log(userapi);
+        const promises = api_list.map(async room_guests => {
+            console.log(room_guests);
             // request details from GitHub’s API with Axios
             userapi.play(
               {"context_uri": host_uri,  "offset" : {
@@ -275,12 +334,17 @@ async function sync_songs(api_list) {
 
     // console.log("NEW host uri: " + host_uri);
 
-
-
 }
 
+router.post('/sync', function(req,res){
+    console.log('Syncing room ' +req.roomID);
+    sync_songs(req.roomID);
+});
+
 router.get('/omt', function(req,res) {
-    console.log('onemoretime');
+
+    console.log('SYNCING');
+
     console.log('KEI Access: ' + kei_access);
     spotifyApi.setAccessToken(kei_access);
     chris_api.setAccessToken(chris_access);
@@ -288,11 +352,10 @@ router.get('/omt', function(req,res) {
 
     host_playback_data = get_host_playback('test');
     // console.log(host_playback_data);
-
+    
     sync_songs(apis_list);
     sync_songs(apis_list);
     sync_songs(apis_list);
-
 
 });
 
@@ -370,16 +433,12 @@ router.post('/select_room', function(req, res) {
       res.render(__dirname + '/views/display_room', {users: users});
     }
   });
-
 });
 
 router.get('/playback', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/webplaybacktest.html'));
   // Continued logic for joining a room, with db entries
 });
-
-
-
 
 
 // set up static routing
@@ -389,9 +448,9 @@ app.use('omt', router);
 app.use('/', router);
 app.use('/create', router);
 app.use('join', router);
-app.listen(process.env.port || 3000);
+app.listen(process.env.PORT || 3000);
 
-console.log("If you own airpods, I'm listening on 3000...");
+console.log("If you own airpods, I'm listening...");
 
 db.once('open', function() {
   console.log('Connected to DB...');
