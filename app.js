@@ -283,6 +283,8 @@ router.post('/select_room', function(req, res) {
       console.log(err);
     } else {
       var users = room.users;
+      users.push(req.body.display_name);
+      room.set({ users: users});
       console.log(users);
       res.render(__dirname + '/views/display_room', {users: users});
     }
