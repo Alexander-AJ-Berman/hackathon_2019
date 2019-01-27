@@ -274,6 +274,23 @@ router.get('/join', function(req, res) {
 
 });
 
+// POST route handler 
+router.post('/select_room', function(req, res) {
+  var user_IDs = [];
+  Room.findOne({ 'name': req.body.name }, function (err, room) {
+    if (err) {
+      console.log(err);
+    } else {
+      var users = room.users;
+      for (var i = 0; i < users.length; i++) {
+        user_IDs.push(users[i].name);
+      }
+      console.log(users);
+      console.log(user_IDs);
+    }
+  });
+});
+
 router.get('/playback', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/webplaybacktest.html'));
   // Continued logic for joining a room, with db entries
