@@ -1,0 +1,14 @@
+<html>
+  <meta></meta>
+  <head></head>
+  <body>
+      <form method="post" action="/select_room">
+        <% users.forEach(function(user) { %>
+          <%=user %><br>
+        <% }) %>
+          <input type="text" name="name"></input>
+          <br>
+          <input type="submit">Join room</input>
+    </form> 
+  </body>
+</html>

@@ -133,15 +133,11 @@ app.get('/callback', function(req, res) {
             refresh_token: refresh_token,
           });
         newUser.save();
-        });
-
-
 
         // we can also pass the token to the browser to make requests from there
         // CREATE USER WITH DATA
-        res.redirect('/choice');
-
-
+        res.redirect('/choice?name=' + body.display_name);
+        });
       } else {
         res.redirect('/#' +
           querystring.stringify({
@@ -260,6 +256,7 @@ router.get('/omt', function(req,res) {
 //   // TODO; for K
 // }
 
+//TESTING CHRIS COMMITS
 router.get('/',function(req,res){
   // spotify_login();
   res.sendFile(path.join(__dirname+'/views/index.html'));
@@ -277,6 +274,7 @@ router.get('/create_room', function(req, res){
 });
 
 router.get('/choice', function(req, res) {
+  //req.query.name
   res.sendFile(path.join(__dirname + '/views/choice.html'));
 });
 
@@ -284,7 +282,6 @@ router.post('/create_room', function(req, res) {
   var name = req.body.name;
   var pwd = req.body.pwd;
   var room_name = req.body.room_name;
-  // MAKEUP
   var roomID = generateRandomString(8);
   var users = [name];
 
@@ -317,19 +314,18 @@ router.get('/join_room', function(req, res) {
 
 // POST route handler
 router.post('/select_room', function(req, res) {
-  var user_IDs = [];
   Room.findOne({ 'name': req.body.name }, function (err, room) {
     if (err) {
       console.log(err);
     } else {
       var users = room.users;
-      for (var i = 0; i < users.length; i++) {
-        user_IDs.push(users[i].name);
-      }
+      users.push(req.body.display_name);
+      room.set({ users: users});
       console.log(users);
-      console.log(user_IDs);
+      res.render(__dirname + '/views/display_room', {users: users});
     }
   });
+  
 });
 
 router.get('/playback', function(req, res) {
