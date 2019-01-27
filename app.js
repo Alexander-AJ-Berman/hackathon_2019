@@ -248,7 +248,6 @@ router.post('/create_room', function(req, res) {
   var name = req.body.name;
   var pwd = req.body.pwd;
   var room_name = req.body.room_name;
-  // MAKEUP
   var roomID = generateRandomString(8);
   var users = [name];
 
@@ -281,19 +280,18 @@ router.get('/join_room', function(req, res) {
 
 // POST route handler
 router.post('/select_room', function(req, res) {
-  var user_IDs = [];
+  
   Room.findOne({ 'name': req.body.name }, function (err, room) {
     if (err) {
       console.log(err);
     } else {
+      console.log(room);
       var users = room.users;
-      for (var i = 0; i < users.length; i++) {
-        user_IDs.push(users[i].name);
-      }
       console.log(users);
-      console.log(user_IDs);
+      res.render(__dirname + '/views/display_room', {users: users});
     }
   });
+  
 });
 
 router.get('/playback', function(req, res) {
