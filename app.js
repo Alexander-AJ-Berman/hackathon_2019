@@ -162,6 +162,7 @@ app.get('/callback', function(req, res) {
             userID: body.id,
             access_token: access_token,
             refresh_token: refresh_token,
+            roomID: ""
           });
         newUser.save();
 
@@ -353,6 +354,14 @@ router.post('/select_room', function(req, res) {
       users.push(req.body.display_name);
       room.set({ users: users});
       room_joined(room, req.body.display_name);
+
+      User.findOne({ 'name': req.body.display_name }, function(err, user) {
+        if (err) {
+          console.log(err);
+        } else {
+          user.roomID = room.roomID;
+        }
+      });
       res.render(__dirname + '/views/display_room', {users: users});
     }
   });
@@ -394,7 +403,8 @@ var userSchema = new mongoose.Schema({
   name: String,
   userID: String,
   access_token: String,
-  refresh_token: String
+  refresh_token: String,
+  roomID: String
 });
 
 // Create a room
