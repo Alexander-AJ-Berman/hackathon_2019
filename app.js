@@ -17,7 +17,7 @@ var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "e69eecc6c2284e549524b8083c8e18da";
 let redirect_uri = 'https://synchronizedairpodplayer.herokuapp.com/callback'; // Your redirect uri
-var SpotifyWebApi = require('spotify-web-api-node');
+var SpotifyWebApi = require('spotify-web-api-node'); 
 
 var rooms_to_hostAPI = [];
 var room_guest_apis = [];
