@@ -62,6 +62,7 @@ app.get('/login', function(req, res) {
 
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
+  console.log(res.cookie(stateKey));
 
   // your application requests authorization
   var scope = 'user-read-private user-read-email user-modify-playback-state';
@@ -75,6 +76,7 @@ app.get('/login', function(req, res) {
       show_dialog: "true"
     }));
 });
+
 
 app.get('/callback', function(req, res) {
 
@@ -111,7 +113,9 @@ app.get('/callback', function(req, res) {
         var access_token = body.access_token,
             refresh_token = body.refresh_token;
 
+        // console.log(body);
         kei_access = body.access_token;
+        // name = body.uri.split("");
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
@@ -122,7 +126,10 @@ app.get('/callback', function(req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
           console.log(body);
+
         });
+
+
 
         // we can also pass the token to the browser to make requests from there
         res.redirect('/#' +
@@ -173,7 +180,7 @@ router.get('/omt', function(req,res) {
 
     spotifyApi.play(
       {"context_uri": "spotify:album:7D2NdGvBHIavgLhmcwhluK",  "offset": {
-    "position": 1} })
+    "position": 1}, "position_ms" : 100000 })
       .then(function(data) {
         console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
       }, function(err) {
@@ -223,6 +230,7 @@ router.get('/create', function(req, res){
 });
 
 router.post('/create_user', function(req, res) {
+
 
   var userID = "user ID Placeholder";
   var access_token = "access token placeholder";
