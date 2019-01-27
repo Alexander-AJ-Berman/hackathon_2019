@@ -268,7 +268,6 @@ router.get('/join', function(req, res) {
       for (var i = 0; i < rooms.length; i++) {
         room_names.push(rooms[i].name);
       }
-      console.log(room_names);
       res.render(__dirname + '/views/join', {room_names: room_names});
     }
   });
