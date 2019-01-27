@@ -38,7 +38,7 @@ var room_guest_apis = [];
 // });
 //
 // let aj_api = new SpotifyWebApi({
-//   clientId: client_id,
+//   clientId: client_id, 
 //   clientSecret: client_secret
 // });
 //
