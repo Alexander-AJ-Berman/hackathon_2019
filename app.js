@@ -44,7 +44,7 @@ var room_guest_apis = [];
 //
 // apis_list = [spotifyApi, chris_api, aj_api];
 //
-// let kei_access = '';
+// let kei_access = ''; 
 
 function room_joined(room, new_user) {
     console.log('room joined');
