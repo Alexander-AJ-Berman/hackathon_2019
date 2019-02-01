@@ -31,7 +31,7 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "e69eecc6c2284e549524b8083c8e18da";
-let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
+let redirect_uri = 'http://synchronizedsap.herokuapp.com/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var rooms_to_hostAPI = [];
@@ -39,18 +39,18 @@ var room_guest_apis = [];
 
 
 function room_joined(room, user_ID)  {
-    console.log('\t======room joined called');
+    console.log('\t=====room joined called');
     refreshAccessToken(user_ID);
   User.findOne({ 'user_ID': user_ID }, function (err, user) {
     if (err) {
       console.log(err);
     } else {
         console.log(user);
-      console.log("ROOM ID: " + room.room_ID);
+      console.log("\tROOM ID: " + room.room_ID);
       var curr_roomID = room.room_ID;
-      console.log(user.access_token);
-      console.log(user.refresh_token);
-      console.log(user.user_ID);
+      // console.log(user.access_token);
+      // console.log(user.refresh_token);
+      // console.log(user.user_ID);
      // var host_id = room_to_host(room);
       // console.log(user.host_id);
 
@@ -60,10 +60,10 @@ function room_joined(room, user_ID)  {
       });
 
       new_api.setAccessToken(user.access_token);
-      console.log("_____________");
-      console.log(new_api);
-      console.log(room.room_ID);
-      console.log(rooms_to_hostAPI);
+
+      // console.log(new_api);
+      // console.log(room.room_ID);
+      // console.log(rooms_to_hostAPI);
 
       var found = false;
       rooms_to_hostAPI.forEach(function(r) {
@@ -73,7 +73,7 @@ function room_joined(room, user_ID)  {
       });
 
       if (!found) {
-          console.log("adding new host");
+          console.log("\tadding new host");
 
           //rooms_to_hostAPI.curr_roomID = new_api;
           // rooms_to_hostAPI
@@ -88,21 +88,21 @@ function room_joined(room, user_ID)  {
               api_list: [new_api] // TODO: remove host api from list?
           };
           room_guest_apis.push(curr_room);
-          console.log(">>ROOM GUEST APIS START");
-          console.log(room_guest_apis);
-          console.log(">>ROOM GUEST APIS END");
+          console.log("\t>>ROOM GUEST APIS START");
+          console.log("\t" + room_guest_apis);
+          console.log("\t>>ROOM GUEST APIS END");
 
 
 
           //rooms_to_guestAPIs.curr_roomID = [100];
       } else{
-          console.log(rooms_to_hostAPI);
-          console.log(room_guest_apis);
-          console.log("adding new guest");
+          // console.log(rooms_to_hostAPI);
+          // console.log(room_guest_apis);
+          console.log("\t adding new guest");
           room_guest_apis.forEach(function(r) {
               if (r.room_ID == room.room_ID){
                   r.api_list.push(new_api);
-                  console.log(room_guest_apis);
+                  console.log("\t" + room_guest_apis);
               }
           });
           //
@@ -153,11 +153,11 @@ app.use(express.static(__dirname + '/public'));
 
 function refreshAccessToken(user_ID){
     // get refresh token from user ID
-    console.log("REFRESHING TOKEN FOR: " + user_ID);
+    console.log("=====REFRESHING TOKEN FOR: " + user_ID);
 
     User.findOne({ 'user_ID': user_ID }, function (err, user) {
       if (err) {
-          console.log("REFRESHACCESTOKEN: couldn't find user with specified ID");
+          console.log("\tREFRESHACCESTOKEN: couldn't find user with specified ID");
           console.log(err);
       } else {
           var refresh_token = user.refresh_token;
@@ -175,7 +175,7 @@ function refreshAccessToken(user_ID){
                 if (!error && response.statusCode === 200) {
                   var access_token = body.access_token;
                   // console.log(access_token);
-                  console.log("DATA RECEIVED:" + body);
+                  console.log("\tDATA RECEIVED:" + body);
                   // update mongo DB here
 
                   user.set({access_token: access_token});
@@ -195,15 +195,6 @@ function refreshAccessToken(user_ID){
 
 
 }
-
-
-app.get('/refresh_token', function(req, res) {
-
-  // requesting access token from refresh token
-
-
-
-});
 
 
 // function get_host_playback(host) {
@@ -237,7 +228,7 @@ app.get('/refresh_token', function(req, res) {
 // }
 
 function sync_one_user(user_ID) {
-    console.log("synchronizing user: " + user_ID);
+    console.log("=====synchronizing user: " + user_ID);
     // check what group the user is currently in
     // get group ID
     // get host of that group
@@ -250,13 +241,13 @@ async function sync_songs(room_ID) {
     // get room
     // console.log("rooms_to_hostAPI:");
     // console.log(rooms_to_hostAPI);
-    console.log("=========synchronizing songs");
+    console.log("=====synchronizing songs");
 
     var host_api;
     rooms_to_hostAPI.forEach(function(r) {
         if (r.room_ID == room_ID){
             host_api = r.api;
-            console.log("found host API");
+            console.log("\tfound host API");
             console.log(host_api);
         }
     });
@@ -268,7 +259,7 @@ async function sync_songs(room_ID) {
     room_guest_apis.forEach(function(r) {
         if (r.room_ID == room_ID){
             room_guests_api_list = r.api_list;
-            console.log("found other APIs");
+            console.log("\tfound other APIs");
         }
     });
 
@@ -282,11 +273,11 @@ async function sync_songs(room_ID) {
       })
       .then(async function(data) {
         // Output items
-        console.log("track num: ",data.body.item.track_number);
-        console.log("track uri: ",data.body.item.album.uri);
-        console.log("track progress: ",data.body.progress_ms);
-        console.log("timestamp: ",data.body.timestamp);
-        console.log("MAC UNIX: " + Date.now());
+        console.log("\t>>>track num: ",data.body.item.track_number);
+        console.log("\t>>>track uri: ",data.body.item.album.uri);
+        console.log("\t>>>track progress: ",data.body.progress_ms);
+        console.log("\t>>>timestamp: ",data.body.timestamp);
+        console.log("\t>>>MAC UNIX: " + Date.now());
 
         host_track_num = data.body.item.track_number;
         host_uri = data.body.item.album.uri;
@@ -300,18 +291,18 @@ async function sync_songs(room_ID) {
               {"context_uri": host_uri,  "offset" : {
             "position": host_track_num-1}, "position_ms" : (Date.now()-host_timestamp)/10 + host_track_progress})
               .then(function(data) {
-                console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
+                console.log('\tPLAYING ONE MORE TIME ON MAIN ACCT!');
               }, function(err) {
-                console.log('Something went wrong when calling room guest APIs', err);
+                console.log('\tSomething went wrong when calling room guest APIs', err);
             });
           })
 
           // wait until all promises resolve
         const results = await Promise.all(promises)
-        console.log("SYNCHRONIZED ASYNCHRONOUSLY");
+        console.log("\tSYNCHRONIZED ASYNCHRONOUSLY");
 
       }, function(err) {
-        console.log('Something went wrong in get current playback state', err);
+        console.log('\tSomething went wrong in get current playback state', err);
       });
     // console.log("NEW host uri: " + host_uri);
 }
@@ -390,7 +381,7 @@ app.get('/callback', function(req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
 
-          console.log("ID: " + body.id);
+          console.log("\tID: " + body.id);
           req.session.user_ID = body.id;
           //console.log(body);
           var newUser = new User({
@@ -421,7 +412,7 @@ app.get('/callback', function(req, res) {
 // User chooses to create a room or join a room
 router.get('/choice', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/choice.html'));
-  console.log("SESSION ID: " + req.session.user_ID);
+  console.log("=====choice SESSION ID: " + req.session.user_ID);
 });
 
 // User is creating a room
@@ -444,6 +435,7 @@ router.post('/create_room', function(req, res) {
     host_ID: req.session.user_ID
   });
   newRoom.save();
+  room_joined(newRoom, req.session.user_ID);
 
   // Add additional create room redirect
   res.render(__dirname + '/views/display_room', {user_IDs: user_IDs, room_ID: room_ID});
@@ -451,7 +443,7 @@ router.post('/create_room', function(req, res) {
 
 // Add someone to a room with synchro logic
 router.get('/join_room', function(req, res) {
-    console.log("JOIN ROOM USER ID: " + req.session.user_ID);
+    console.log("=====JOIN ROOM USER ID: " + req.session.user_ID);
     // refresh user access token
   var room_names = []
   Room.find({}, 'name', function(err, rooms) {
@@ -468,6 +460,7 @@ router.get('/join_room', function(req, res) {
 
 // POST route handler
 router.post('/select_room', function(req, res) {
+    console.log("=====select room")
   Room.findOne({ 'name': req.body.name }, function (err, room) {
     if (err) {
       console.log(err);
