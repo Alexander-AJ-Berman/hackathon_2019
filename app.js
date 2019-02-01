@@ -25,7 +25,7 @@ var room_guest_apis = [];
 
 function room_joined(room, new_user)  {
     console.log('room joined');
-  User.findOne({ 'name': new_user }, function (err, user) {
+  User.findOne({ 'userID': new_user }, function (err, user) {
     if (err) {
       console.log(err);
     } else {
@@ -254,6 +254,7 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
+
 // function get_host_playback(host) {
 //     console.log('get_host_playback');
 //     // get host's spotify API data
@@ -284,12 +285,20 @@ app.get('/refresh_token', function(req, res) {
 //
 // }
 
+function sync_one_user(userID) {
+    console.log("synchronizing user: " + userID);
+    // check what group the user is currently in
+    // get group ID
+    // get host of that group
+    // get playback details of host
+    // use host
+}
+
 async function sync_songs(roomID) {
     // get host
     // get room
     console.log("rooms_to_hostAPI:");
     console.log(rooms_to_hostAPI);
-
 
     var host_api;
     rooms_to_hostAPI.forEach(function(r) {
@@ -426,7 +435,7 @@ router.post('/select_room', function(req, res) {
       var users = room.users;
       var roomID = room.roomID;
       users.push(req.body.display_name);
-      room.set({ users: users});
+      room.set({ users: users}); // update database
       room_joined(room, req.body.display_name);
 
       User.findOne({ 'name': req.body.display_name }, function(err, user) {
@@ -481,8 +490,8 @@ var userSchema = new mongoose.Schema({
 var roomSchema = new mongoose.Schema({
   name: String,
   roomID: String,
-  users: [String],
-  pwd: String
+  user_IDs: [String],
+  host_ID: String
 });
 
 
