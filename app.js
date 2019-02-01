@@ -31,7 +31,7 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "e69eecc6c2284e549524b8083c8e18da";
-let redirect_uri = 'https://synchronizedsap.herokuapp.com/callback'; // Your redirect uri
+let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var rooms_to_hostAPI = [];
@@ -530,8 +530,8 @@ db.once('open', function() {
 
 // Connect mongoose, credentials: USER - sap_user PASS - sap_user1
 mongoose.connect(
-  'mongodb://sap_user:sap_user1@ds113765.mlab.com:13765/sap',
-  { useNewUrlParser: true}
+  'mongodb://SapUser1:Synchronizedsap1@ds247690.mlab.com:47690/sap',
+  { useNewUrlParser: true }
   );
 
 // Creating a user schema
