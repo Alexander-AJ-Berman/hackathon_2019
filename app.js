@@ -19,35 +19,12 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "e69eecc6c2284e549524b8083c8e18da";
-let redirect_uri = 'https://synchronizedairpodplayer.herokuapp.com/callback'; // Your redirect uri
-var SpotifyWebApi = require('spotify-web-api-node'); 
- 
+let redirect_uri = 'https://synchronizedsap.herokuapp.com/callback'; // Your redirect uri
+var SpotifyWebApi = require('spotify-web-api-node');
+
 var rooms_to_hostAPI = [];
 var room_guest_apis = [];
 
-// var rooms_to_guestAPIs = {
-//     roomID: 0,
-//     api_list: []
-// };
-
-// let spotifyApi = new SpotifyWebApi({
-//   clientId: client_id,
-//   clientSecret: client_secret
-// });
-//
-// let chris_api = new SpotifyWebApi({
-//   clientId: client_id,
-//   clientSecret: client_secret
-// });
-//
-// let aj_api = new SpotifyWebApi({
-//   clientId: client_id, 
-//   clientSecret: client_secret
-// });
-//
-// apis_list = [spotifyApi, chris_api, aj_api];
-//
-// let kei_access = ''; 
 
 function room_joined(room, new_user)  {
     console.log('room joined');
@@ -311,7 +288,6 @@ app.get('/refresh_token', function(req, res) {
 // }
 
 async function sync_songs(roomID) {
-
     // get host
     // get room
     console.log("rooms_to_hostAPI:");
@@ -364,7 +340,7 @@ async function sync_songs(roomID) {
             // request details from GitHub’s API with Axios
             room_guests.play(
               {"context_uri": host_uri,  "offset" : {
-            "position": host_track_num-1}, "position_ms" :host_track_progress})
+            "position": host_track_num-1}, "position_ms" : (Date.now()-host_timestamp)/10 + host_track_progress})
               .then(function(data) {
                 console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
               }, function(err) {
@@ -390,28 +366,6 @@ router.post('/sync', function(req,res){
     sync_songs(req.body.roomID);
 });
 
-// router.get('/omt', function(req,res) {
-//
-//     console.log('SYNCING');
-//
-//     console.log('KEI Access: ' + kei_access);
-//     spotifyApi.setAccessToken(kei_access);
-//     chris_api.setAccessToken(chris_access);
-//     aj_api.setAccessToken(aj_access);
-//
-//     host_playback_data = get_host_playback('test');
-//     // console.log(host_playback_data);
-//
-//     sync_songs(apis_list);
-//     sync_songs(apis_list);
-//     sync_songs(apis_list);
-//
-// });
-
-// // Handles spotify login and Auth
-// function spotify_login() {
-//   // TODO; for K
-// }
 
 //TESTING CHRIS COMMITS
 router.get('/',function(req,res){
@@ -441,7 +395,6 @@ router.post('/create_room', function(req, res) {
   var room_name = req.body.room_name;
   var roomID = generateRandomString(8);
   var users = [name];
-
   var newRoom = new Room({
     name: room_name,
     roomID: roomID,
@@ -449,7 +402,6 @@ router.post('/create_room', function(req, res) {
     pwd: pwd
   });
   newRoom.save();
-
   res.send("Thanks for navigating! Please wait");
 });
 
@@ -466,7 +418,6 @@ router.get('/join_room', function(req, res) {
       res.render(__dirname + '/views/join', {room_names: room_names});
     }
   });
-
 });
 
 // POST route handler
@@ -542,6 +493,11 @@ var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
 
 
+<<<<<<< HEAD
 // TODO: For AJ Cookies, remove from DB when leaves, 
 //Users ID on their sync button
 // New DB email credentials to Kei and Fethke
+=======
+// TODO: For AJ Cookies, remove from DB when leaves, Users ID on their sync button
+// New DB email credentials to Kei and Fethke
+>>>>>>> 70b1d87c46ce1ebcf4dc4838d5446aec569bbb3e
