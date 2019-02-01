@@ -6,6 +6,17 @@ var db = mongoose.connection;
 const router = express.Router();
 var bodyParser = require('body-parser');
 var async = require('async');
+
+
+// Cookie parser set up
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+// Express session set up
+var session = require('express-session');
+app.use(session({secret: "Shh, it's a secret!"}));
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -16,7 +27,7 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "e69eecc6c2284e549524b8083c8e18da";
-let redirect_uri = 'https://synchronizedsap.herokuapp.com/callback'; // Your redirect uri
+let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var rooms_to_hostAPI = [];
@@ -130,8 +141,7 @@ var generateRandomString = function(length) {
 };
 var stateKey = 'spotify_auth_state';
 
-app.use(express.static(__dirname + '/public'))
-   .use(cookieParser());
+app.use(express.static(__dirname + '/public'));
 
 app.get('/login', function(req, res) {
   var state = generateRandomString(16);
@@ -199,8 +209,13 @@ app.get('/callback', function(req, res) {
           json: true
         };
 
+
+
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
+
+          console.log("ID: " + body.id);
+          req.session.userID = body.id;
           //console.log(body);
           var newUser = new User({
             name: body.display_name,
@@ -373,9 +388,8 @@ router.post('/sync', function(req,res){
 });
 
 
-//TESTING CHRIS COMMITS
+// Landing page, renders index.html
 router.get('/',function(req,res){
-  // spotify_login();
   res.sendFile(path.join(__dirname+'/views/index.html'));
   //__dirname : It will resolve to your project folder.
 });
@@ -391,7 +405,6 @@ router.get('/create_room', function(req, res){
 });
 
 router.get('/choice', function(req, res) {
-  //req.query.name
   res.sendFile(path.join(__dirname + '/views/choice.html'));
 });
 
@@ -404,8 +417,8 @@ router.post('/create_room', function(req, res) {
   var newRoom = new Room({
     name: room_name,
     roomID: roomID,
-    users: users,
-    pwd: pwd
+    user_IDs: users,
+    host_ID: ""
   });
   newRoom.save();
   res.send("Thanks for navigating! Please wait");
@@ -435,8 +448,8 @@ router.post('/select_room', function(req, res) {
       var users = room.users;
       var roomID = room.roomID;
       users.push(req.body.display_name);
-      room.set({ users: users}); // update database
-      room_joined(room, req.body.display_name);
+      room.set({ users: users});
+      room_joined(room, req.session.userID);
 
       User.findOne({ 'name': req.body.display_name }, function(err, user) {
         if (err) {
@@ -499,5 +512,8 @@ var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
 
 
+// TODO: For AJ Cookies, remove from DB when leaves,
+//Users ID on their sync button
+// New DB email credentials to Kei and Fethke
 // TODO: For AJ Cookies, remove from DB when leaves, Users ID on their sync button
 // New DB email credentials to Kei and Fethke
