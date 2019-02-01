@@ -531,7 +531,7 @@ db.once('open', function() {
 // Connect mongoose, credentials: USER - sap_user PASS - sap_user1
 mongoose.connect(
   'mongodb://SapUser1:Synchronizedsap1@ds247690.mlab.com:47690/sap',
-  { useNewUrlParser: true}
+  { useNewUrlParser: true }
   );
 
 // Creating a user schema
@@ -561,5 +561,3 @@ var Room = mongoose.model('Room', roomSchema);
 
 // SynchronizedSapUser2019
 // Synchronizedsap1
-
-
