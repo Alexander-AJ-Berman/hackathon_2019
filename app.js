@@ -39,7 +39,8 @@ var room_guest_apis = [];
 
 
 function room_joined(room, user_ID)  {
-    console.log('room joined');
+    console.log('\t======room joined called');
+    refreshAccessToken(user_ID);
   User.findOne({ 'user_ID': user_ID }, function (err, user) {
     if (err) {
       console.log(err);
@@ -150,29 +151,58 @@ app.use(express.static(__dirname + '/public'));
 
 
 
+function refreshAccessToken(user_ID){
+    // get refresh token from user ID
+    console.log("REFRESHING TOKEN FOR: " + user_ID);
+
+    User.findOne({ 'user_ID': user_ID }, function (err, user) {
+      if (err) {
+          console.log("REFRESHACCESTOKEN: couldn't find user with specified ID");
+          console.log(err);
+      } else {
+          var refresh_token = user.refresh_token;
+          var authOptions = {
+              url: 'https://accounts.spotify.com/api/token',
+              headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+              form: {
+                  grant_type: 'refresh_token',
+                  refresh_token: refresh_token
+                },
+                json: true
+              };
+
+              request.post(authOptions, function(error, response, body) {
+                if (!error && response.statusCode === 200) {
+                  var access_token = body.access_token;
+                  // console.log(access_token);
+                  console.log("DATA RECEIVED:" + body);
+                  // update mongo DB here
+
+                  user.set({access_token: access_token});
+                  user.save();
+
+                  // res.send({
+                  //   'access_token': access_token
+                  // });
+
+
+                }
+              });
+          // console.log(user.refresh_token);
+      }
+    });
+
+
+
+}
+
 
 app.get('/refresh_token', function(req, res) {
 
   // requesting access token from refresh token
-  var refresh_token = req.query.refresh_token;
-  var authOptions = {
-    url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
-    form: {
-      grant_type: 'refresh_token',
-      refresh_token: refresh_token
-    },
-    json: true
-  };
 
-  request.post(authOptions, function(error, response, body) {
-    if (!error && response.statusCode === 200) {
-      var access_token = body.access_token;
-      res.send({
-        'access_token': access_token
-      });
-    }
-  });
+
+
 });
 
 
@@ -218,8 +248,9 @@ function sync_one_user(user_ID) {
 async function sync_songs(room_ID) {
     // get host
     // get room
-    console.log("rooms_to_hostAPI:");
-    console.log(rooms_to_hostAPI);
+    // console.log("rooms_to_hostAPI:");
+    // console.log(rooms_to_hostAPI);
+    console.log("=========synchronizing songs");
 
     var host_api;
     rooms_to_hostAPI.forEach(function(r) {
@@ -246,7 +277,7 @@ async function sync_songs(room_ID) {
     var host_track_progress = '';
     var host_timestamp = '';
 
-    console.log(host_api);
+    // console.log(host_api);
     host_api.getMyCurrentPlaybackState({
       })
       .then(async function(data) {
@@ -263,7 +294,7 @@ async function sync_songs(room_ID) {
         host_timestamp = data.body.timestamp;
 
         const promises = room_guests_api_list.map(async room_guests => {
-            console.log(room_guests);
+            // console.log(room_guests);
             // request details from GitHub’s API with Axios
             room_guests.play(
               {"context_uri": host_uri,  "offset" : {
@@ -271,7 +302,7 @@ async function sync_songs(room_ID) {
               .then(function(data) {
                 console.log('PLAYING ONE MORE TIME ON MAIN ACCT!');
               }, function(err) {
-                console.log('Something went wrong!', err);
+                console.log('Something went wrong when calling room guest APIs', err);
             });
           })
 
@@ -282,7 +313,6 @@ async function sync_songs(room_ID) {
       }, function(err) {
         console.log('Something went wrong in get current playback state', err);
       });
-
     // console.log("NEW host uri: " + host_uri);
 }
 
@@ -357,8 +387,6 @@ app.get('/callback', function(req, res) {
           json: true
         };
 
-
-
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
 
@@ -416,6 +444,7 @@ router.post('/create_room', function(req, res) {
     host_ID: req.session.user_ID
   });
   newRoom.save();
+
   // Add additional create room redirect
   res.render(__dirname + '/views/display_room', {user_IDs: user_IDs, room_ID: room_ID});
 });
@@ -423,6 +452,7 @@ router.post('/create_room', function(req, res) {
 // Add someone to a room with synchro logic
 router.get('/join_room', function(req, res) {
     console.log("JOIN ROOM USER ID: " + req.session.user_ID);
+    // refresh user access token
   var room_names = []
   Room.find({}, 'name', function(err, rooms) {
     if (err) {
@@ -447,6 +477,7 @@ router.post('/select_room', function(req, res) {
       // Adds user to room list
       user_IDs.push(req.session.user_ID);
       room.set({ user_IDs: user_IDs });
+      room.save();
       // Call room_joined function
       room_joined(room, req.session.user_ID);
 
