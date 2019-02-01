@@ -23,7 +23,7 @@ var rooms_to_hostAPI = [];
 var room_guest_apis = [];
 
 
-function room_joined(room, new_user) {
+function room_joined(room, new_user)  {
     console.log('room joined');
   User.findOne({ 'name': new_user }, function (err, user) {
     if (err) {
@@ -488,3 +488,7 @@ var roomSchema = new mongoose.Schema({
 
 var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
+
+
+// TODO: For AJ Cookies, remove from DB when leaves, Users ID on their sync button
+// New DB email credentials to Kei and Fethke
