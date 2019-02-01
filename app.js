@@ -531,8 +531,4 @@ var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
 
 
-// TODO: For AJ Cookies, remove from DB when leaves,
-//Users ID on their sync button
-// New DB email credentials to Kei and Fethke
-// TODO: For AJ Cookies, remove from DB when leaves, Users ID on their sync button
-// New DB email credentials to Kei and Fethke
+// tODO: for AJ do db reset, and dynamically update people in room
