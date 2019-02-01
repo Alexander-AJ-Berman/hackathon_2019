@@ -446,6 +446,7 @@ router.post('/select_room', function(req, res) {
       var room_ID = room.room_ID;
       // Adds user to room list
       user_IDs.push(req.session.user_ID);
+      console.log("Adding this to user_IDS: " + user_IDs);
       room.set({ user_IDs: user_IDs });
       // Call room_joined function
       room_joined(room, req.session.user_ID);
@@ -532,3 +533,4 @@ var Room = mongoose.model('Room', roomSchema);
 
 
 // tODO: for AJ do db reset, and dynamically update people in room
+// - people in room not saving correctly to mlab
