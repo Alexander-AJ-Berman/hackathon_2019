@@ -20,6 +20,7 @@ app.use(session({
   saveUninitialized: true
 }));
 
+// COMMENT
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
