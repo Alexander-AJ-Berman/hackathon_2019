@@ -34,18 +34,18 @@ var rooms_to_hostAPI = [];
 var room_guest_apis = [];
 
 
-function room_joined(room, new_user)  {
+function room_joined(room, user_ID)  {
     console.log('room joined');
-  User.findOne({ 'userID': new_user }, function (err, user) {
+  User.findOne({ 'user_ID': user_ID }, function (err, user) {
     if (err) {
       console.log(err);
     } else {
         console.log(user);
-      console.log("ROOM ID: " + room.roomID);
-      var curr_roomID = room.roomID;
+      console.log("ROOM ID: " + room.room_ID);
+      var curr_roomID = room.room_ID;
       console.log(user.access_token);
       console.log(user.refresh_token);
-      console.log(user.userID);
+      console.log(user.user_ID);
      // var host_id = room_to_host(room);
       // console.log(user.host_id);
 
@@ -57,12 +57,12 @@ function room_joined(room, new_user)  {
       new_api.setAccessToken(user.access_token);
       console.log("_____________");
       console.log(new_api);
-      console.log(room.roomID);
+      console.log(room.room_ID);
       console.log(rooms_to_hostAPI);
 
       var found = false;
       rooms_to_hostAPI.forEach(function(r) {
-          if (r.roomID == room.roomID){
+          if (r.room_ID == room.room_ID){
               found = true;
           }
       });
@@ -73,13 +73,13 @@ function room_joined(room, new_user)  {
           //rooms_to_hostAPI.curr_roomID = new_api;
           // rooms_to_hostAPI
           var curr_host_data = {
-              roomID: room.roomID,
+              room_ID: room.room_ID,
               api: new_api
           }
           rooms_to_hostAPI.push(curr_host_data);
 
           var curr_room = {
-              roomID: room.roomID,
+              room_ID: room.room_ID,
               api_list: [new_api] // TODO: remove host api from list?
           };
           room_guest_apis.push(curr_room);
@@ -95,7 +95,7 @@ function room_joined(room, new_user)  {
           console.log(room_guest_apis);
           console.log("adding new guest");
           room_guest_apis.forEach(function(r) {
-              if (r.roomID == room.roomID){
+              if (r.room_ID == room.room_ID){
                   r.api_list.push(new_api);
                   console.log(room_guest_apis);
               }
@@ -143,107 +143,9 @@ var stateKey = 'spotify_auth_state';
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/login', function(req, res) {
-  var state = generateRandomString(16);
-  res.cookie(stateKey, state);
-  // console.log(res.cookie(stateKey));
-
-  // your application requests authorization
-  var scope = 'user-read-private user-read-email user-modify-playback-state user-read-playback-state';
-  res.redirect('https://accounts.spotify.com/authorize?' +
-    querystring.stringify({
-      response_type: 'code',
-      client_id: client_id,
-      scope: scope,
-      redirect_uri: redirect_uri,
-      state: state,
-      show_dialog: "true"
-    }));
-});
-
-
-app.get('/callback', function(req, res) {
-
-  // your application requests refresh and access tokens
-  // after checking the state parameter
-
-  var code = req.query.code || null;
-  var state = req.query.state || null;
-  var storedState = req.cookies ? req.cookies[stateKey] : null;
-
-  if (state === null || state !== storedState) {
-    res.redirect('/#' +
-      querystring.stringify({
-        error: 'state_mismatch'
-      }));
-  } else {
-    res.clearCookie(stateKey);
-    var authOptions = {
-      url: 'https://accounts.spotify.com/api/token',
-      form: {
-        code: code,
-        redirect_uri: redirect_uri,
-        grant_type: 'authorization_code'
-      },
-      headers: {
-        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
-      },
-      json: true
-    };
-
-    request.post(authOptions, function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-
-        var access_token = body.access_token,
-            refresh_token = body.refresh_token,
-            name = body.name,
-            id = body.id;
-
-        // console.log(body);
-        kei_access = body.access_token;
-        // name = body.uri.split("");
-
-        var options = {
-          url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + access_token },
-          json: true
-        };
 
 
 
-        // use the access token to access the Spotify Web API
-        request.get(options, function(error, response, body) {
-
-          console.log("ID: " + body.id);
-          req.session.userID = body.id;
-          //console.log(body);
-          var newUser = new User({
-            name: body.display_name,
-            userID: body.id,
-            access_token: access_token,
-            refresh_token: refresh_token,
-            roomID: ""
-          });
-        newUser.save();
-
-        // we can also pass the token to the browser to make requests from there
-        // CREATE USER WITH DATA
-        res.redirect('/choice?name=' + body.display_name);
-        });
-      } else {
-        res.redirect('/#' +
-          querystring.stringify({
-            error: 'invalid_token'
-          }));
-      }
-    });
-  }
-
-});
-
-app.post('/prompt_name', function(req, res) {
-  console.log(req.body.name);
-});
 
 app.get('/refresh_token', function(req, res) {
 
@@ -378,15 +280,7 @@ async function sync_songs(roomID) {
       });
 
     // console.log("NEW host uri: " + host_uri);
-
 }
-
-router.post('/sync', function(req,res){
-    console.log('======Syncing room ' +req.body.roomID);
-    console.log(rooms_to_hostAPI);
-    sync_songs(req.body.roomID);
-});
-
 
 // Landing page, renders index.html
 router.get('/',function(req,res){
@@ -394,18 +288,112 @@ router.get('/',function(req,res){
   //__dirname : It will resolve to your project folder.
 });
 
-router.get('/spotifyLogin',function(req, res){
-  res.sendFile(path.join(__dirname+'/views/spotifyLogin.html'));
-  //__dirname : It will resolve to your project folder.
+app.get('/login', function(req, res) {
+  var state = generateRandomString(16);
+  res.cookie(stateKey, state);
+  // console.log(res.cookie(stateKey));
+
+  // your application requests authorization
+  var scope = 'user-read-private user-read-email user-modify-playback-state user-read-playback-state';
+  res.redirect('https://accounts.spotify.com/authorize?' +
+    querystring.stringify({
+      response_type: 'code',
+      client_id: client_id,
+      scope: scope,
+      redirect_uri: redirect_uri,
+      state: state,
+      show_dialog: "true"
+    }));
+});
+
+
+app.get('/callback', function(req, res) {
+
+  // your application requests refresh and access tokens
+  // after checking the state parameter
+
+  var code = req.query.code || null;
+  var state = req.query.state || null;
+  var storedState = req.cookies ? req.cookies[stateKey] : null;
+
+  if (state === null || state !== storedState) {
+    res.redirect('/#' +
+      querystring.stringify({
+        error: 'state_mismatch'
+      }));
+  } else {
+    res.clearCookie(stateKey);
+    var authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      form: {
+        code: code,
+        redirect_uri: redirect_uri,
+        grant_type: 'authorization_code'
+      },
+      headers: {
+        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+      },
+      json: true
+    };
+
+    request.post(authOptions, function(error, response, body) {
+      if (!error && response.statusCode === 200) {
+
+        var access_token = body.access_token,
+            refresh_token = body.refresh_token,
+            name = body.name,
+            id = body.id;
+
+        // console.log(body);
+        kei_access = body.access_token;
+        // name = body.uri.split("");
+
+        var options = {
+          url: 'https://api.spotify.com/v1/me',
+          headers: { 'Authorization': 'Bearer ' + access_token },
+          json: true
+        };
+
+
+
+        // use the access token to access the Spotify Web API
+        request.get(options, function(error, response, body) {
+
+          console.log("ID: " + body.id);
+          req.session.userID = body.id;
+          //console.log(body);
+          var newUser = new User({
+            name: body.display_name,
+            userID: body.id,
+            access_token: access_token,
+            refresh_token: refresh_token,
+            roomID: ""
+          });
+        newUser.save();
+
+        // we can also pass the token to the browser to make requests from there
+        // CREATE USER WITH DATA
+        res.redirect('/choice?name=' + body.display_name);
+        });
+      } else {
+        res.redirect('/#' +
+          querystring.stringify({
+            error: 'invalid_token'
+          }));
+      }
+    });
+  }
+
+});
+
+router.get('/choice', function(req, res) {
+  res.sendFile(path.join(__dirname + '/views/choice.html'));
+  console.log("SESSION ID: " + req.session.userID);
 });
 
 router.get('/create_room', function(req, res){
   res.sendFile(path.join(__dirname + '/views/create_room.html'));
   // Continued logic for creating a room with database entries
-});
-
-router.get('/choice', function(req, res) {
-  res.sendFile(path.join(__dirname + '/views/choice.html'));
 });
 
 router.post('/create_room', function(req, res) {
@@ -426,6 +414,7 @@ router.post('/create_room', function(req, res) {
 
 // Add someone to a room with synchro logic
 router.get('/join_room', function(req, res) {
+    console.log("JOIN ROOM USER ID: " + req.session.userID);
   var room_names = []
   Room.find({}, 'name', function(err, rooms) {
     if (err) {
@@ -445,10 +434,11 @@ router.post('/select_room', function(req, res) {
     if (err) {
       console.log(err);
     } else {
-      var users = room.users;
+      var users = room.user_IDs
       var roomID = room.roomID;
-      users.push(req.body.display_name);
-      room.set({ users: users});
+      users.push(req.session.user_ID);
+      room.set({ user_IDs: users});
+      console.log("join room USER ID: " + req.session.userID);
       room_joined(room, req.session.userID);
 
       User.findOne({ 'name': req.body.display_name }, function(err, user) {
@@ -463,10 +453,28 @@ router.post('/select_room', function(req, res) {
   });
 });
 
-router.get('/playback', function(req, res) {
-  res.sendFile(path.join(__dirname + '/views/webplaybacktest.html'));
-  // Continued logic for joining a room, with db entries
+router.post('/sync', function(req,res){
+  console.log('======Syncing room ' +req.body.roomID);
+  console.log(rooms_to_hostAPI);
+  sync_songs(req.body.roomID);
 });
+
+
+
+// router.get('/spotifyLogin',function(req, res){
+//   res.sendFile(path.join(__dirname+'/views/spotifyLogin.html'));
+//   //__dirname : It will resolve to your project folder.
+// });
+
+
+// router.get('/playback', function(req, res) {
+//   res.sendFile(path.join(__dirname + '/views/webplaybacktest.html'));
+//   // Continued logic for joining a room, with db entries
+// });
+
+// app.post('/prompt_name', function(req, res) {
+//   console.log(req.body.name);
+// });
 
 
 // set up static routing
