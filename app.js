@@ -6,9 +6,17 @@ var db = mongoose.connection;
 const router = express.Router();
 var bodyParser = require('body-parser');
 var async = require('async');
-var cookieParser = require('cookie-parser');
 
+
+// Cookie parser set up
+var cookieParser = require('cookie-parser');
 app.use(cookieParser());
+
+// Express session set up
+var session = reqiure('express-session');
+app.use(session({secret: "Shh, it's a secret!"}));
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -133,8 +141,7 @@ var generateRandomString = function(length) {
 };
 var stateKey = 'spotify_auth_state';
 
-app.use(express.static(__dirname + '/public'))
-   .use(cookieParser());
+app.use(express.static(__dirname + '/public'));
 
 app.get('/login', function(req, res) {
   var state = generateRandomString(16);
@@ -369,7 +376,6 @@ router.post('/sync', function(req,res){
 
 //TESTING CHRIS COMMITS
 router.get('/',function(req,res){
-  // spotify_login();
   res.sendFile(path.join(__dirname+'/views/index.html'));
   //__dirname : It will resolve to your project folder.
 });
@@ -493,11 +499,8 @@ var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
 
 
-<<<<<<< HEAD
 // TODO: For AJ Cookies, remove from DB when leaves, 
 //Users ID on their sync button
 // New DB email credentials to Kei and Fethke
-=======
 // TODO: For AJ Cookies, remove from DB when leaves, Users ID on their sync button
 // New DB email credentials to Kei and Fethke
->>>>>>> 70b1d87c46ce1ebcf4dc4838d5446aec569bbb3e
