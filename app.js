@@ -6,6 +6,9 @@ var db = mongoose.connection;
 const router = express.Router();
 var bodyParser = require('body-parser');
 var async = require('async');
+var cookieParser = require('cookie-parser');
+
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -539,5 +542,6 @@ var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
 
 
-// TODO: For AJ Cookies, remove from DB when leaves, Users ID on their sync button
+// TODO: For AJ Cookies, remove from DB when leaves, 
+//Users ID on their sync button
 // New DB email credentials to Kei and Fethke
