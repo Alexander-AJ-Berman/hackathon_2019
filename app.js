@@ -537,7 +537,7 @@ db.once('open', function() {
 
 // Connect mongoose, credentials: USER - sap_user PASS - sap_user1
 mongoose.connect(
-  'mongodb://sap_user:sap_user1@ds113765.mlab.com:13765/sap',
+  'mongodb://SapUser1:Synchronizedsap1@ds247690.mlab.com:47690/sap',
   { useNewUrlParser: true}
   );
 
@@ -565,3 +565,8 @@ var Room = mongoose.model('Room', roomSchema);
 
 // tODO: for AJ do db reset, and dynamically update people in room
 // - people in room not saving correctly to mlab
+
+// SynchronizedSapUser2019
+// Synchronizedsap1
+
+
