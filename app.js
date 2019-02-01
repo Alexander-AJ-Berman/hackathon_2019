@@ -13,7 +13,7 @@ var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
 // Express session set up
-var session = reqiure('express-session');
+var session = require('express-session');
 app.use(session({secret: "Shh, it's a secret!"}));
 
 
@@ -27,7 +27,7 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "e69eecc6c2284e549524b8083c8e18da";
-let redirect_uri = 'https://synchronizedsap.herokuapp.com/callback'; // Your redirect uri
+let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var rooms_to_hostAPI = [];
@@ -209,8 +209,13 @@ app.get('/callback', function(req, res) {
           json: true
         };
 
+        
+
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
+
+          console.log("ID: " + body.id);
+          req.session.userID = body.id;
           //console.log(body);
           var newUser = new User({
             name: body.display_name,
@@ -220,7 +225,7 @@ app.get('/callback', function(req, res) {
             roomID: ""
           });
         newUser.save();
-
+          
         // we can also pass the token to the browser to make requests from there
         // CREATE USER WITH DATA
         res.redirect('/choice?name=' + body.display_name);
@@ -374,7 +379,7 @@ router.post('/sync', function(req,res){
 });
 
 
-//TESTING CHRIS COMMITS
+// Landing page, renders index.html
 router.get('/',function(req,res){
   res.sendFile(path.join(__dirname+'/views/index.html'));
   //__dirname : It will resolve to your project folder.
@@ -391,7 +396,6 @@ router.get('/create_room', function(req, res){
 });
 
 router.get('/choice', function(req, res) {
-  //req.query.name
   res.sendFile(path.join(__dirname + '/views/choice.html'));
 });
 
@@ -404,8 +408,8 @@ router.post('/create_room', function(req, res) {
   var newRoom = new Room({
     name: room_name,
     roomID: roomID,
-    users: users,
-    pwd: pwd
+    user_IDs: users,
+    host_ID: ""
   });
   newRoom.save();
   res.send("Thanks for navigating! Please wait");
@@ -436,7 +440,7 @@ router.post('/select_room', function(req, res) {
       var roomID = room.roomID;
       users.push(req.body.display_name);
       room.set({ users: users});
-      room_joined(room, req.body.display_name);
+      room_joined(room, req.session.userID);
 
       User.findOne({ 'name': req.body.display_name }, function(err, user) {
         if (err) {
@@ -490,8 +494,8 @@ var userSchema = new mongoose.Schema({
 var roomSchema = new mongoose.Schema({
   name: String,
   roomID: String,
-  users: [String],
-  pwd: String
+  user_IDs: [String],
+  host_ID: String
 });
 
 
