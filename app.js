@@ -537,3 +537,7 @@ var roomSchema = new mongoose.Schema({
 
 var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
+
+
+// TODO: For AJ Cookies, remove from DB when leaves, Users ID on their sync button
+// New DB email credentials to Kei and Fethke
