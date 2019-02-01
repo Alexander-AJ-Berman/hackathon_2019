@@ -4,7 +4,7 @@ $(document).ready(() => {
     console.log(room_id);
 
     syncMap = {
-        roomID: room_id
+        room_ID: room_id
     };
 
     let syncParams = $.param(syncMap);
