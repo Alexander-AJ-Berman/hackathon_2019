@@ -31,7 +31,7 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "e69eecc6c2284e549524b8083c8e18da";
-let redirect_uri = 'https://localhost:3000/callback'; // Your redirect uri
+let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var rooms_to_hostAPI = [];
@@ -468,8 +468,11 @@ router.post('/select_room', function(req, res) {
       var user_IDs = room.user_IDs;
       var room_ID = room.room_ID;
       // Adds user to room list
-      user_IDs.push(req.session.user_ID);
-      console.log("Adding this to user_IDS: " + user_IDs);
+      if (req.session.user_ID != "Null") {
+        user_IDs.push(req.session.user_ID);
+        console.log("Adding this to user_IDS: " + user_IDs);
+      }
+      
       room.set({ user_IDs: user_IDs });
       room.save();
       // Call room_joined function
@@ -555,9 +558,5 @@ var roomSchema = new mongoose.Schema({
 var User = mongoose.model('User', userSchema);
 var Room = mongoose.model('Room', roomSchema);
 
-
-// tODO: for AJ do db reset, and dynamically update people in room
-// - people in room not saving correctly to mlab
-
-// SynchronizedSapUser2019
-// Synchronizedsap1
+// Dynamically update people in room
+// Removing people when they close app (logout button)
