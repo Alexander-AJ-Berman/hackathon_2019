@@ -163,7 +163,7 @@ function refreshAccessToken(user_ID){
           var refresh_token = user.refresh_token;
           var authOptions = {
               url: 'https://accounts.spotify.com/api/token',
-              headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+              headers: { 'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')) },
               form: {
                   grant_type: 'refresh_token',
                   refresh_token: refresh_token
@@ -355,7 +355,7 @@ app.get('/callback', function(req, res) {
         grant_type: 'authorization_code'
       },
       headers: {
-        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
       },
       json: true
     };
@@ -469,6 +469,7 @@ router.post('/select_room', function(req, res) {
       var room_ID = room.room_ID;
       // Adds user to room list
       user_IDs.push(req.session.user_ID);
+      console.log("Adding this to user_IDS: " + user_IDs);
       room.set({ user_IDs: user_IDs });
       room.save();
       // Call room_joined function
@@ -556,3 +557,4 @@ var Room = mongoose.model('Room', roomSchema);
 
 
 // tODO: for AJ do db reset, and dynamically update people in room
+// - people in room not saving correctly to mlab
