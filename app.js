@@ -206,8 +206,8 @@ app.get('/refresh_token', function(req, res) {
 //
 // }
 
-function sync_one_user(userID) {
-    console.log("synchronizing user: " + userID);
+function sync_one_user(user_ID) {
+    console.log("synchronizing user: " + user_ID);
     // check what group the user is currently in
     // get group ID
     // get host of that group
@@ -215,7 +215,7 @@ function sync_one_user(userID) {
     // use host
 }
 
-async function sync_songs(roomID) {
+async function sync_songs(room_ID) {
     // get host
     // get room
     console.log("rooms_to_hostAPI:");
@@ -223,19 +223,19 @@ async function sync_songs(roomID) {
 
     var host_api;
     rooms_to_hostAPI.forEach(function(r) {
-        if (r.roomID == roomID){
+        if (r.room_ID == room_ID){
             host_api = r.api;
             console.log("found host API");
             console.log(host_api);
         }
     });
 
-    console.log("\tROOM ID: " + roomID);
+    console.log("\tROOM ID: " + room_ID);
     var room_guests_api_list;
 
     // get list of guests
     room_guest_apis.forEach(function(r) {
-        if (r.roomID == roomID){
+        if (r.room_ID == room_ID){
             room_guests_api_list = r.api_list;
             console.log("found other APIs");
         }
@@ -367,10 +367,10 @@ app.get('/callback', function(req, res) {
           //console.log(body);
           var newUser = new User({
             name: body.display_name,
-            userID: body.id,
+            user_ID: body.id,
             access_token: access_token,
             refresh_token: refresh_token,
-            roomID: ""
+            room_ID: ""
           });
         newUser.save();
 
@@ -393,7 +393,7 @@ app.get('/callback', function(req, res) {
 // User chooses to create a room or join a room
 router.get('/choice', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/choice.html'));
-  console.log("SESSION ID: " + req.session.userID);
+  console.log("SESSION ID: " + req.session.user_ID);
 });
 
 // User is creating a room
@@ -411,7 +411,7 @@ router.post('/create_room', function(req, res) {
 
   var newRoom = new Room({
     name: room_name,
-    roomID: room_ID,
+    room_ID: room_ID,
     user_IDs: user_IDs,
     host_ID: req.session.user_ID
   });
@@ -422,7 +422,7 @@ router.post('/create_room', function(req, res) {
 
 // Add someone to a room with synchro logic
 router.get('/join_room', function(req, res) {
-    console.log("JOIN ROOM USER ID: " + req.session.userID);
+    console.log("JOIN ROOM USER ID: " + req.session.user_ID);
   var room_names = []
   Room.find({}, 'name', function(err, rooms) {
     if (err) {
@@ -465,9 +465,9 @@ router.post('/select_room', function(req, res) {
 });
 
 router.post('/sync', function(req,res){
-  console.log('======Syncing room ' +req.body.roomID);
+  console.log('======Syncing room ' +req.body.room_ID);
   console.log(rooms_to_hostAPI);
-  sync_songs(req.body.roomID);
+  sync_songs(req.body.room_ID);
 });
 
 
