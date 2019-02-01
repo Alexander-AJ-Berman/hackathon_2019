@@ -480,7 +480,7 @@ router.post('/select_room', function(req, res) {
         if (err) {
           console.log(err);
         } else {
-
+        
           // Assigns a user to a room
           user.room_ID = room.room_ID;
         }
