@@ -14,7 +14,11 @@ app.use(cookieParser());
 
 // Express session set up
 var session = require('express-session');
-app.use(session({secret: "Shh, it's a secret!"}));
+app.use(session({
+  secret: "Shh, it's a secret!",
+  resave: true,
+  saveUninitialized: true
+}));
 
 
 app.use(bodyParser.json());
@@ -282,10 +286,9 @@ async function sync_songs(roomID) {
     // console.log("NEW host uri: " + host_uri);
 }
 
-// Landing page, renders index.html
+// Renders index.html, initial landing page
 router.get('/',function(req,res){
   res.sendFile(path.join(__dirname+'/views/index.html'));
-  //__dirname : It will resolve to your project folder.
 });
 
 app.get('/login', function(req, res) {
@@ -360,7 +363,7 @@ app.get('/callback', function(req, res) {
         request.get(options, function(error, response, body) {
 
           console.log("ID: " + body.id);
-          req.session.userID = body.id;
+          req.session.user_ID = body.id;
           //console.log(body);
           var newUser = new User({
             name: body.display_name,
@@ -373,7 +376,7 @@ app.get('/callback', function(req, res) {
 
         // we can also pass the token to the browser to make requests from there
         // CREATE USER WITH DATA
-        res.redirect('/choice?name=' + body.display_name);
+        res.redirect('/choice');
         });
       } else {
         res.redirect('/#' +
@@ -386,30 +389,35 @@ app.get('/callback', function(req, res) {
 
 });
 
+
+// User chooses to create a room or join a room
 router.get('/choice', function(req, res) {
   res.sendFile(path.join(__dirname + '/views/choice.html'));
   console.log("SESSION ID: " + req.session.userID);
 });
 
+// User is creating a room
 router.get('/create_room', function(req, res){
   res.sendFile(path.join(__dirname + '/views/create_room.html'));
   // Continued logic for creating a room with database entries
 });
 
+// User has submitted room name
 router.post('/create_room', function(req, res) {
-  var name = req.body.name;
-  var pwd = req.body.pwd;
   var room_name = req.body.room_name;
-  var roomID = generateRandomString(8);
-  var users = [name];
+  var room_ID = generateRandomString(8);
+  var user_IDs = [req.session.user_ID];
+
+
   var newRoom = new Room({
     name: room_name,
-    roomID: roomID,
-    user_IDs: users,
-    host_ID: ""
+    roomID: room_ID,
+    user_IDs: user_IDs,
+    host_ID: req.session.user_ID
   });
   newRoom.save();
-  res.send("Thanks for navigating! Please wait");
+  // Add additional create room redirect
+  res.render(__dirname + '/views/display_room', {user_IDs: user_IDs, room_ID: room_ID});
 });
 
 // Add someone to a room with synchro logic
@@ -434,21 +442,24 @@ router.post('/select_room', function(req, res) {
     if (err) {
       console.log(err);
     } else {
-      var users = room.user_IDs
-      var roomID = room.roomID;
-      users.push(req.session.user_ID);
-      room.set({ user_IDs: users});
-      console.log("join room USER ID: " + req.session.userID);
-      room_joined(room, req.session.userID);
+      var user_IDs = room.user_IDs;
+      var room_ID = room.room_ID;
+      // Adds user to room list
+      user_IDs.push(req.session.user_ID);
+      room.set({ user_IDs: user_IDs });
+      // Call room_joined function
+      room_joined(room, req.session.user_ID);
 
-      User.findOne({ 'name': req.body.display_name }, function(err, user) {
+      User.findOne({ 'user_ID': req.session.user_ID }, function(err, user) {
         if (err) {
           console.log(err);
         } else {
-          user.roomID = room.roomID;
+
+          // Assigns a user to a room
+          user.room_ID = room.room_ID;
         }
       });
-      res.render(__dirname + '/views/display_room', {users: users, roomID: roomID});
+      res.render(__dirname + '/views/display_room', {user_IDs: user_IDs, room_ID: room_ID});
     }
   });
 });
@@ -501,16 +512,16 @@ mongoose.connect(
 // Creating a user schema
 var userSchema = new mongoose.Schema({
   name: String,
-  userID: String,
+  user_ID: String,
   access_token: String,
   refresh_token: String,
-  roomID: String
+  room_ID: String
 });
 
 // Create a room
 var roomSchema = new mongoose.Schema({
   name: String,
-  roomID: String,
+  room_ID: String,
   user_IDs: [String],
   host_ID: String
 });

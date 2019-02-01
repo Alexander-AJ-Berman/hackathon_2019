@@ -118,13 +118,13 @@ button:active {
     <script src="sync_frontend.js"></script>
 
 <div class="bg-image"></div>
-<p id ='thisroomid'><%= roomID %><p>
+<p id ='thisroomid'><%= room_ID %><p>
 <div class="bg-text">
     <button class="button" id="sync">SYNC</button>
 
 
-    <h3>Members: <%= roomID %></h3>
-    <% users.forEach(function(user) { %>
+    <h3>Members: <%= room_ID %></h3>
+    <% user_IDs.forEach(function(user) { %>
       <%=user %><br>
     <% }) %>
 </div>
