@@ -159,12 +159,19 @@ button:active {
 <div class="bg-text">
   <h1 style="font-size:50px">Pick your room</h1>
   <form method="post" action="/select_room">
-    <% room_names.forEach(function(name) { %>
+    <select>
+        <% room_names.forEach(function(name) { %>
+      <option>
+        <%=name %>
+      </option>
+      <% }) %>
+    </select>
+    <!-- <% room_names.forEach(function(name) { %>
       <%=name %><br>
     <% }) %>
       
       Enter Room Name (that matches names above): <input type="text" name="name" placeholder="Room name..."></input>
-      <br>
+      <br> -->
       <input type="submit">Join room</input>
 </form> 
 </div>
