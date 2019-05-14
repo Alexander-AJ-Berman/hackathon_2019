@@ -20,7 +20,6 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// COMMENT
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -34,7 +33,7 @@ var cookieParser = require('cookie-parser');
 let client_id =  "8fdf389a4342424b8c52c8e8456653ae";
 let client_secret = "1f1266a1adb248c0b8acbe1577313e90";
 let redirect_uri = 'https://synchronizedairpodplayer.herokuapp.com/callback'; // Your redirect uri
-// let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
+//let redirect_uri = 'http://localhost:3000/callback'; // Your redirect uri
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var rooms_to_hostAPI = [];
@@ -394,11 +393,14 @@ app.get('/callback', function(req, res) {
             refresh_token: refresh_token,
             room_ID: ""
           });
-        newUser.save();
+          console.log("STRT");
+          console.log(newUser);
+          newUser.save();
+          console.log("END")
 
         // we can also pass the token to the browser to make requests from there
         // CREATE USER WITH DATA
-        res.redirect('/choice');
+          res.redirect('/choice');
         });
       } else {
         res.redirect('/#' +
@@ -536,7 +538,7 @@ db.once('open', function() {
 
 // Connect mongoose, credentials: USER - sap_user PASS - sap_user1
 mongoose.connect(
-  'mongodb://SapUser1:Synchronizedsap1@ds247690.mlab.com:47690/sap',
+  'mongodb://user:password1@ds113765.mlab.com:13765/sap',
   { useNewUrlParser: true }
   );
 
